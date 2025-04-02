@@ -1,38 +1,26 @@
+#include "algo/hashmap.h"
+#include <cstdint>
 #include <iostream>
-#include "algo/list.h"
-#include "algo/sort.h"
-// #include "algo/ustring.h"
+#include <string>
+#include "algo/vector.h"
 
-list<double> foo() {
-   list<double> lst;
+using std::string;
 
-   for (int i = 0; i < 100; i++)
-     lst.push_back(i);
+// Хеш-функция
+uint32_t hash(string key) {
+  uint16_t h = 0;
+  for (auto &ch: key)
+    h ^= int((ch - ' ') * UINT32_MAX / (127 - ' '));
+  return h;
+}
 
-   return lst;
- }
 
-int main()
-{
-    list<double> lst(foo());
+int main() {
+  hashmap<string, string> mp(hash);
 
-    for (int i = 0; i < 25; ++i)
-      lst.erase(++lst.begin());
+  mp.insert("A", "abracadabra");
+  mp.insert("P", "protego");
 
-    for (auto &a : lst) {
-      std::cout << a << " ";
-    }
-    std::cout << std::endl;
-
-    list<double> lst2;
-    lst2 = lst;
-    lst2.insert(++lst.begin(), 2.0);
-
-    sort(lst2.begin(), lst2.end());
-    for (auto &a : lst2) {
-       std::cout << a << " ";
-    }
-    std::cout << std::endl;
-
-    std::cout << lst2.size() << std::endl;
+  for (auto &a: mp)
+    std::cout << a << std::endl;
 }
