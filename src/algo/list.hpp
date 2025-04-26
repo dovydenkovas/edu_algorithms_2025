@@ -1,7 +1,5 @@
-#include <algorithm>
-#include <ctype.h>
-#include <exception>
-#include <iostream>
+#pragma once
+#include <cstdlib>
 
 template <class T> class list {
 public:
@@ -15,7 +13,7 @@ private:
     Node() {};
     Node(Node &) = delete;
     Node(Node &&) = delete;
-    Node(T data, Node *next): data{data}, next{next} {}
+    Node(T data, Node *next) : data{data}, next{next} {}
   };
 
   Node *first = nullptr;
@@ -51,7 +49,7 @@ public:
   }
 };
 
-template <class T> class list<T>::iterator {
+/*template <class T> class list<T>::iterator {
   Node *ptr;
 
 public:
@@ -69,8 +67,8 @@ public:
   bool operator!=(iterator other) const { return !(*this == other); }
   T &operator*() { return ptr->data; }
 
-  friend Node* list<T>::as_node(iterator it);
-};
+  friend Node *list<T>::as_node(iterator it);
+  };*/
 
 template <class T> list<T>::list(const list &other) {
   clear();
@@ -131,11 +129,9 @@ template <class T> list<T>::Node *list<T>::get_prev_node(Node *nxt) {
   return node;
 }
 
-
 template <class T> list<T>::Node *list<T>::as_node(iterator it) {
   return it.ptr;
 }
-
 
 template <class T> void list<T>::pop_back() {
   if (empty())

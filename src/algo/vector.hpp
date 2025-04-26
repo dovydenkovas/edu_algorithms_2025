@@ -2,7 +2,6 @@
 #define VECTOR_H
 
 #include <algorithm>
-#include <ctype.h>
 #include <exception>
 #include <iostream>
 
@@ -106,7 +105,7 @@ template <class T> void vector<T>::fill(T value) {
 
 template <class T> vector<T>::vector(const vector &other) {
   reserve(other.allocated_size);
-  for (int i = 0; i < other.size(); ++i)
+  for (size_t i = 0; i < other.size(); ++i)
     array[i] = other[i];
   vector_size = other.vector_size;
 }
@@ -129,6 +128,7 @@ template <class T> vector<T> &vector<T>::operator=(const vector &other) {
 }
 
 template <class T> vector<T> &vector<T>::operator=(vector &&other) {
+  std::cout << "AB\n";
   delete this->array;
   array = other.array;
   vector_size = other.vector_size;
@@ -169,7 +169,7 @@ template <class T> void vector<T>::pop_back() {
 }
 
 template <class T> void vector<T>::insert(size_t index, T item) {
-  resize(vector_size+1);
+  resize(vector_size + 1);
   for (size_t i = vector_size - 1; i > index; --i) {
     array[i] = array[i - 1];
   }

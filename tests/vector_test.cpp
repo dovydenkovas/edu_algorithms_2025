@@ -1,5 +1,4 @@
 #include <gtest/gtest.h>
-#include <iostream>
 #include <vector.hpp>
 
 TEST(vector, init) {
@@ -16,18 +15,18 @@ TEST(vector, resize) {
   ASSERT_EQ(100, a.size());
 }
 
-// TEST(vector, pushpop) {
-//   vector<int> a;
-//   ASSERT_TRUE(a.empty());
-//   for (int i = 100; i < 120; ++i)
-//     a.push_back(i);
-//   ASSERT_FALSE(a.empty());
+TEST(vector, pushpop) {
+  vector<int> a;
+  ASSERT_TRUE(a.empty());
+  for (int i = 100; i < 120; ++i)
+    a.push_back(i);
+  ASSERT_FALSE(a.empty());
 
-//   for (int i = 119; i >= 100; --i) {
-//     ASSERT_EQ(10, a[a.size() - 1]);
-//     a.pop_back();
-//   }
-// }
+  for (int i = 119; i >= 100; --i) {
+    ASSERT_EQ(i, a[a.size() - 1]);
+    a.pop_back();
+  }
+}
 
 TEST(vector, iterator) {
   vector<int> a;
