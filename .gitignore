@@ -2,3 +2,5 @@
 .ccls-cache*
 build*
 a.out
+compile_commands.json
+**dist**

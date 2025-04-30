@@ -1,5 +1,7 @@
+#include <algo/vector.hpp>
 #include <gtest/gtest.h>
-#include <vector.hpp>
+
+using algo::vector;
 
 TEST(vector, init) {
   vector<int> a;
@@ -8,11 +10,30 @@ TEST(vector, init) {
   ASSERT_EQ(10, b.size());
 }
 
-TEST(vector, resize) {
+TEST(vector, copy) {
+  vector<double> a(10);
+  a.fill(42);
+  vector<double> b;
+  b = a;
+  ASSERT_NE(&a, &b);
+  for (int i = 0; i < a.size(); ++i)
+    ASSERT_EQ(a[i], b[i]);
+
+  auto c{a};
+  ASSERT_NE(&a, &c);
+  for (int i = 0; i < a.size(); ++i)
+    ASSERT_EQ(a[i], c[i]);
+}
+
+TEST(vector, resizereserve) {
   vector<int> a;
+  ASSERT_EQ(10, a.capacity());
+  a.reserve(90);
+  ASSERT_EQ(90, a.capacity());
   ASSERT_EQ(0, a.size());
   a.resize(100);
   ASSERT_EQ(100, a.size());
+  ASSERT_EQ(100, a.capacity());
 }
 
 TEST(vector, pushpop) {
@@ -21,11 +42,13 @@ TEST(vector, pushpop) {
   for (int i = 100; i < 120; ++i)
     a.push_back(i);
   ASSERT_FALSE(a.empty());
+  ASSERT_EQ(110, a[10]);
 
   for (int i = 119; i >= 100; --i) {
     ASSERT_EQ(i, a[a.size() - 1]);
     a.pop_back();
   }
+  ASSERT_TRUE(a.empty());
 }
 
 TEST(vector, iterator) {

@@ -1,3 +1,5 @@
+#pragma once
+
 #include "vector.hpp"
 #include <algorithm>
 #include <cstdint>
@@ -8,15 +10,7 @@
 #include <string>
 #include <utility>
 
-using std::wstring;
-
-// Хеш-функция строк
-uint32_t string_hash(std::string key) {
-  uint16_t h = 0;
-  for (auto &ch : key)
-    h ^= int((ch - ' ') * UINT32_MAX / (127 - ' '));
-  return h;
-}
+namespace algo {
 
 template <class K, class V, uint32_t hash(K)> class hashmap {
 private:
@@ -24,7 +18,7 @@ private:
   vector<item *> data;
   size_t keys_count;
   item *nil = nullptr;
-  item *removed;
+  item *removed = nullptr;
 
   size_t get(K &key) const;
   void resize(size_t new_size);
@@ -32,22 +26,22 @@ private:
 public:
   class iterator;
 
-  hashmap() : data{16}, keys_count{0}, removed{new item} { data.fill(nil); }
-  hashmap(hashmap &other) { *this = other; }
-  hashmap(hashmap &&other) { *this = other; }
+  explicit hashmap() : data{16}, keys_count{0}, removed{new item} { data.fill(nil); }
+  explicit hashmap(hashmap &other) : data{}, keys_count{0}, removed{new item} {
+    *this = other;
+  }
 
-  hashmap &operator=(hashmap &other);
-  hashmap &&operator=(hashmap &&other);
+  hashmap &operator=(const hashmap &other);
 
-  V &operator[](K &key);
-  V operator[](K &key) const;
+  V &operator[](K key);
+  V operator[](K key) const;
 
   size_t size() { return keys_count; }
   bool empty() { return keys_count == 0; }
 
-  bool contains(K &key) const;
-  void insert(K key, V &&value);
-  void erase(K &key);
+  bool contains(K key) const;
+  void insert(K key, V value);
+  void erase(K key);
 
   iterator begin() {
     auto it = data.begin();
@@ -65,16 +59,32 @@ public:
     delete removed;
   }
 };
-/*
+
+template <class K, class V, uint32_t hash(K)>
+hashmap<K, V, hash> &
+hashmap<K, V, hash>::operator=(const hashmap<K, V, hash> &other) {
+  data.resize(other.data.size());
+  keys_count = other.keys_count;
+  for (int i = 0; i < data.size(); ++i)
+    if (data[i] == other.removed)
+      data[i] = removed;
+    else if (other.data[i] == nil)
+      data[i] = nil;
+    else
+      data[i] = new item{other.data[i]->first, other.data[i]->second};
+
+  return *this;
+}
+
 template <class K, class V, uint32_t hash(K)>
 class hashmap<K, V, hash>::iterator {
-  using item = std::pair<K, V>;
-  vector<item *>::iterator it;
+  typename vector<item *>::iterator it;
   item *removed;
-  vector<item *>::iterator end;
+  typename vector<item *>::iterator end;
 
 public:
-  explicit iterator(vector<item *>::iterator it, item *removed, vector<item *>::iterator end)
+  explicit iterator(typename vector<item *>::iterator it, item *removed,
+                    typename vector<item *>::iterator end)
       : it(it), removed(removed), end(end) {}
   iterator &operator++() {
     ++it;
@@ -91,22 +101,27 @@ public:
 
   bool operator==(iterator other) const { return it == other.it; }
   bool operator!=(iterator other) const { return !(*this == other); }
-  K operator*() const { return (*it)->first; }
+  std::pair<K, V> operator*() const { return *(*it); }
 };
-*/
 
+// Масштабирует таблицу с пересчетом адресов всех элементов.
 template <class K, class V, uint32_t hash(K)>
 void hashmap<K, V, hash>::resize(size_t new_size) {
   vector<item *> old = data;
+  keys_count = 0;
   data.resize(new_size);
   data.fill(nil);
   for (auto &p : old) {
     if (p != nil && p != removed) {
       insert(p->first, std::move(p->second));
     }
+
+    delete p;
   }
 }
 
+// Возвращает индекс значения в таблице по ключу.
+// Если ключа нет - вызывает исключение.
 template <class K, class V, uint32_t hash(K)>
 size_t hashmap<K, V, hash>::get(K &key) const {
   uint32_t h = hash(key) % data.size();
@@ -124,18 +139,24 @@ size_t hashmap<K, V, hash>::get(K &key) const {
   throw std::out_of_range("Ключ вне диапазона.");
 }
 
+// Возвращает значение по ключу.
+// Если ключа нет - вызывает исключение.
 template <class K, class V, uint32_t hash(K)>
-V &hashmap<K, V, hash>::operator[](K &key) {
+V &hashmap<K, V, hash>::operator[](K key) {
   return data[get(key)]->second;
 }
 
+// Возвращает значение по ключу.
+// Если ключа нет - вызывает исключение.
 template <class K, class V, uint32_t hash(K)>
-V hashmap<K, V, hash>::operator[](K &key) const {
+V hashmap<K, V, hash>::operator[](K key) const {
   return data[get(key)]->second;
 }
 
+// Добавляет пару ключ-значение в дерево.
+// Если ключ уже добавлен - вызывает исключение.
 template <class K, class V, uint32_t hash(K)>
-void hashmap<K, V, hash>::insert(K key, V &&value) {
+void hashmap<K, V, hash>::insert(K key, V value) {
   if (keys_count + 1 >= data.size())
     resize(data.size() * 2);
 
@@ -155,16 +176,19 @@ void hashmap<K, V, hash>::insert(K key, V &&value) {
   }
 }
 
+// Удаляет элемент из таблицы.
+// Если ключа нет - вызывает исключение.
 template <class K, class V, uint32_t hash(K)>
-void hashmap<K, V, hash>::erase(K &key) {
+void hashmap<K, V, hash>::erase(K key) {
   size_t index = get(key);
   delete data[index];
   data[index] = removed;
   --keys_count;
 }
 
+// Возвращает true, если ключ есть в таблице.
 template <class K, class V, uint32_t hash(K)>
-bool hashmap<K, V, hash>::contains(K &key) const {
+bool hashmap<K, V, hash>::contains(K key) const {
   try {
     get(key);
     return true;
@@ -172,3 +196,4 @@ bool hashmap<K, V, hash>::contains(K &key) const {
     return false;
   }
 }
+}; // namespace algo
