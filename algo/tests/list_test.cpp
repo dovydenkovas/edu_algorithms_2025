@@ -102,7 +102,7 @@ TEST(list, sort) {
   list<int> a;
   // 10 7 4 1 2 5 8
   // 1  2 4 5 7 8 10
-  for (int i = -10; i < 10; i+=3)
+  for (int i = -10; i < 10; i += 3)
     a.push_back(abs(i));
 
   a.sort();
@@ -149,16 +149,30 @@ TEST(list, sort) {
   ASSERT_EQ(8, *(++e.begin()));
 
   // case 6
-   list<int> f;
-   for (int i = 0; i < 100; ++i)
-     f.push_back(i);
+  list<int> f;
+  for (int i = 0; i < 100; ++i)
+    f.push_back(i);
 
-   f.sort();
+  f.sort();
 
-   ASSERT_EQ(100, f.size());
-   i = 0;
-   for (auto &v : f) {
-     ASSERT_EQ(v, i);
-     ++i;
-   }
+  ASSERT_EQ(100, f.size());
+  i = 0;
+  for (auto &v : f) {
+    ASSERT_EQ(v, i);
+    ++i;
+  }
+
+  // case 7
+  list<int> g;
+  for (int i = 99; i >= 0; --i)
+    g.push_back(i);
+
+  g.sort();
+
+  ASSERT_EQ(100, g.size());
+  i = 0;
+  for (auto &v : g) {
+    ASSERT_EQ(v, i);
+    ++i;
+  }
 }

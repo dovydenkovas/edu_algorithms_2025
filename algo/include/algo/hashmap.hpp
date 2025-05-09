@@ -26,8 +26,8 @@ private:
 public:
   class iterator;
 
-  explicit hashmap() : data{16}, keys_count{0}, removed{new item} { data.fill(nil); }
-  explicit hashmap(hashmap &other) : data{}, keys_count{0}, removed{new item} {
+  explicit hashmap() : data{16}, keys_count{0}, removed{(item*)this} { data.fill(nil); }
+  explicit hashmap(hashmap &other) : data{}, keys_count{0}, removed{(item*)this} {
     *this = other;
   }
 
@@ -56,7 +56,6 @@ public:
     for (auto &p : data)
       if (p != nil && p != removed)
         delete p;
-    delete removed;
   }
 };
 

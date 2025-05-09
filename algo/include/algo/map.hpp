@@ -57,11 +57,11 @@ public:
     if (is_end)
       return *this;
     // Пример обхода следующий:
-    //       D
-    //     /   \
-    //    B     F
-    //   / \   / \
-    //  A   C E   G
+    //       D         |
+    //     /   \       |
+    //    B     F      |
+    //   / \   / \     |
+    //  A   C E   G    |
     // Если есть правая ветвь - следующий элемент минимальный в ней.
     // Например, потомки элементов B, D, F.
     if (node->right) {
@@ -122,11 +122,11 @@ template <class K, class V> map<K, V> &map<K, V>::operator=(map &other) {
 template <class K, class V>
 typename map<K, V>::Node *map<K, V>::next_node(typename map<K, V>::Node *node) {
   // Пример обхода следующий:
-  //       D
-  //     /   \
-  //    B     F
-  //   / \   / \
-  //  A   C E   G
+  //       D          //
+  //     /   \        //
+  //    B     F       //
+  //   / \   / \      //
+  //  A   C E   G     //
   // Если есть правая ветвь - следующий элемент минимальный в ней.
   // Например, потомки элементов B, D, F.
   if (node->right) {

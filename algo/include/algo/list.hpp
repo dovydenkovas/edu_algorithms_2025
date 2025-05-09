@@ -10,7 +10,6 @@ private:
     T data;
     Node *next;
 
-    Node(){};
     Node(Node &) = delete;
     Node(Node &&) = delete;
     Node(T data, Node *next) : data{data}, next{next} {}
@@ -18,7 +17,7 @@ private:
 
   class iterator;
   Node *first = nullptr;
-  Node *last = new Node; // Элемент-заглушка, следующий за последним элементом.
+  Node *last = nullptr;
   size_t list_size = 0;
   Node *get_prev_node(Node *nxt);
   Node *as_node(iterator it);
@@ -40,22 +39,25 @@ public:
   void clear();
   void sort();
 
-  iterator begin() const { return iterator{first}; }
-  iterator end() const { return iterator{last}; }
+  iterator begin() const { return iterator{first, first, false}; }
+  iterator end() const { return iterator{last, first, true}; }
 
-  ~list() {
-    clear();
-    delete last;
-  }
+  ~list() { clear(); }
 };
 
 template <class T> class list<T>::iterator {
   Node *ptr;
+  Node *first;
+  bool is_end;
 
 public:
-  explicit iterator(Node *it) : ptr(it) {}
+  explicit iterator(Node *it, Node *root, bool is_end_)
+      : ptr(it), first(root), is_end(is_end_) {}
   iterator &operator++() {
-    ptr = ptr->next;
+    if (ptr->next == first)
+      is_end = true;
+    else
+      ptr = ptr->next;
     return *this;
   }
   iterator operator++(int) {
@@ -63,7 +65,9 @@ public:
     ++(*this);
     return retval;
   }
-  bool operator==(iterator other) const { return ptr == other.ptr; }
+  bool operator==(iterator other) const {
+    return ptr == other.ptr && is_end == other.is_end;
+  }
   bool operator!=(iterator other) const { return !(*this == other); }
   T &operator*() { return ptr->data; }
 
@@ -84,25 +88,26 @@ template <class T> list<T> &list<T>::operator=(const list &other) {
 }
 
 template <class T> typename list<T>::iterator list<T>::push_back(T item) {
-  Node *node = new Node{item, last};
+  Node *node = new Node{item, first};
 
   if (!first) { // Для первого элемента.
     first = node;
-    last->next = first;
+    last = node;
   }
 
-  Node *prelast = get_prev_node(last);
-  prelast->next = node;
-  node->next = last;
+  last->next = node;
+  last = node;
+
   ++list_size;
-  return iterator{node};
+  return iterator{node, first, false};
 }
 
-template <class T> typename list<T>::Node *list<T>::get_prev_node(Node *nxt) {
+template <class T> typename list<T>::Node *list<T>::get_prev_node(Node *nxt)
+{
   if (!first)
     return nullptr;
   Node *node = first;
-  while (node->next != nxt && node->next != last)
+  while (node->next != nxt && node->next != first)
     node = node->next;
   return node;
 }
@@ -116,15 +121,19 @@ template <class T> void list<T>::pop_back() {
     return;
 
   Node *node = first;
-  while (node->next->next != last)
+  while (node->next->next != first)
     node = node->next;
 
-  if (node->next == first)
-    first = nullptr;
-
-  delete node->next;
-  node->next = last;
+  delete last;
   --list_size;
+
+  if (node->next == first) {
+    first = nullptr;
+    last = nullptr;
+  } else {
+  node->next = first;
+  last = node;
+  }
 }
 
 template <class T>
@@ -136,7 +145,7 @@ typename list<T>::iterator list<T>::insert(iterator position, T item) {
   Node *node = new Node{item, prev->next};
   prev->next = node;
   ++list_size;
-  return iterator{node};
+  return iterator{node, first, false};
 }
 
 template <class T>
@@ -150,7 +159,7 @@ typename list<T>::iterator list<T>::erase(iterator position) {
     first = as_node(position)->next;
   delete as_node(position);
   --list_size;
-  return iterator(prev_elem->next);
+  return iterator(prev_elem->next, first, false);
 }
 
 template <class T> void list<T>::clear() {
@@ -162,13 +171,27 @@ template <class T> void list<T>::clear() {
     node = node->next;
     delete del;
   }
-
+  delete last;
   first = nullptr;
+  last = nullptr;
 }
 
 template <class T> void list<T>::sort() {
   size_t lst_size = size();
+
+  if (lst_size <= 1)
+    return;
+
   first = merge_sort(nullptr, first, lst_size);
+
+  // Восстановить указатель на последний элемент и
+  // цикличность списка
+  Node *node = first;
+  for (int i = 0; i < lst_size - 1; ++i)
+    node = node->next;
+
+  node->next = first;
+  last = node;
 }
 
 template <class T>
