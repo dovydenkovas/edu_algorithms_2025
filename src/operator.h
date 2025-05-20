@@ -4,20 +4,23 @@
 #include "entities.h"
 #include "userinterface.h"
 
-#include "algo/map.hpp"
-#include "algo/hashmap.hpp"
-#include "algo/list.hpp"
+#include <algo/map.hpp>
+#include <algo/hashmap.hpp>
+#include <algo/hash.h>
+#include <algo/list.hpp>
 
 class Operator {
-  map<string, Client> clients;
-  hashmap<string, Sim, string_hash> sims;
-  list<SimRegistation> registrations;
-  UserInterface *ui;
+  algo::map<wstring, Client> clients;
+  algo::hashmap<wstring, Sim, algo::wstring_hash> sims;
+  algo::list<SimRegistation> registrations;
+  UITable *table;
+  UIForms *forms;
+
+  bool is_match_pattern(wstring str, wstring pattern);
+
 
 public:
-  Operator(Table *table, Forms *forms) { ui = new UserInterface(this); }
-
-  ~Operator() { delete ui; }
+  Operator(UITable *table, UIForms *forms) : table{table}, forms{forms} {};
 
   // Регистрация нового клиента.
   void add_client(Client client);
@@ -34,7 +37,7 @@ public:
   // Поиск клиента по «номер паспорта».
   // Результаты поиска – все сведения о найденном клиенте и номера SIM-карт,
   // которые ему выданы.
-  void find_client(string passport_number);
+  void find_client(wstring passport_number);
 
   // Поиск клиента по фрагментам ФИО или адреса.
   // Результаты поиска – список найденных клиентов с указанием номера паспорта,
