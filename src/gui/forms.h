@@ -1,6 +1,7 @@
 #pragma once
 #include "../userinterface.h"
 
-class GuiForms: public Forms {
-
+class GuiForms: public UIForms {
+public:
+  GuiForms();
 };
