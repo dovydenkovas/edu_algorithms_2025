@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <exception>
+#include <initializer_list>
 #include <iostream>
 
 namespace algo {
@@ -16,6 +17,11 @@ public:
   class iterator;
 
   explicit vector() { reserve(10); }
+  explicit vector(std::initializer_list<T> lst) {
+    reserve(10);
+    for (auto &item: lst )
+      push_back(item);
+  }
   explicit vector(size_t new_size) { resize(new_size); }
   vector(const vector &other);
 
@@ -33,6 +39,7 @@ public:
 
   void insert(size_t index, T item);
   void erase(size_t index);
+  void clear();
 
   void reserve(size_t new_size);
   void resize(size_t new_size);
@@ -102,7 +109,7 @@ template <class T> vector<T>::vector(const vector &other) {
 
 template <class T> vector<T> &vector<T>::operator=(const vector &other) {
   reserve(other.vec_size);
-  for (int i = 0; i < other.size(); ++i)
+  for (size_t i = 0; i < other.size(); ++i)
     array[i] = other[i];
   vec_size = other.vec_size;
   return *this;
@@ -137,6 +144,13 @@ template <class T> void vector<T>::erase(size_t index) {
   for (size_t i = index; i < size() - 1; ++i)
     array[i] = array[i + 1];
   pop_back();
+}
+
+template <class T> void vector<T>::clear() {
+  delete[] array;
+  vec_capacity = 0;
+  vec_size = 0;
+  reserve(10);
 }
 
 }; // namespace algo

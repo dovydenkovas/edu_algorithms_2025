@@ -148,6 +148,7 @@ typename list<T>::iterator list<T>::insert(iterator position, T item) {
   return iterator{node, first, false};
 }
 
+// Удаляет заданный элемент, возвращает итератор на элемент, следующий за удаляемым.
 template <class T>
 typename list<T>::iterator list<T>::erase(iterator position) {
   if (empty() || position == end())
