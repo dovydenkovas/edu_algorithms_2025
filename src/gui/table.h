@@ -15,8 +15,8 @@ class GuiTable: public virtual UITable {
 public:
   // GuiTable();
   void clear() override;
-  void set_title(algo::vector<std::wstring> t) override;
-  void add_row(algo::vector<std::wstring> r) override;
+  void set_title(algo::vector<std::wstring> &t) override;
+  void add_row(algo::vector<std::wstring> &r) override;
   void render() override;
   ~GuiTable() override;
 };

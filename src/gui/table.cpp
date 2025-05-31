@@ -10,12 +10,12 @@ void GuiTable::clear() {
   column_width.clear();
 }
 
-void GuiTable::set_title(algo::vector<std::wstring> t) {
+void GuiTable::set_title(algo::vector<std::wstring> &t) {
   clear();
   title = t;
 }
 
-void GuiTable::add_row(algo::vector<std::wstring> row) {
+void GuiTable::add_row(algo::vector<std::wstring> &row) {
   if (row.size() != title.size())
     throw std::runtime_error(
         "Ошибка формата таблицы. В строке неправильное количество столбцов.");
@@ -43,11 +43,11 @@ void GuiTable::calculate_table_width() {
 
 void GuiTable::render_line() {
   // Горизонтальная черта
-  std::wcout << "*";
+  std::wcout << "+";
   for (size_t i = 0; i < title.size(); ++i) {
     std::wcout.width(column_width[i] + 3);
     std::wcout.fill(L'-');
-    std::wcout << "*";
+    std::wcout << "+";
   }
   std::wcout << std::endl;
   std::wcout.fill(L' ');

@@ -9,9 +9,10 @@ enum class Error {
   UserExist,
   UserNotExist,
   SimExist,
+  SimNotExist,
 };
 
-class Client {
+class User {
   wstring passport_number;
   wstring name;
   uint16_t birth_year;
@@ -19,8 +20,11 @@ class Client {
   wstring passport_date_of_issue;
 
 public:
-  Client(wstring name, uint16_t birth_year, wstring address, string passport_number);
-  wstring get_name() const { return address; }
+  User(wstring name, uint16_t birth_year, wstring address,
+         wstring passport_number, wstring passport_date_of_issue)
+      : passport_number(passport_number), name(name), birth_year(birth_year),
+        address(address), passport_date_of_issue(passport_date_of_issue) {}
+  wstring get_name() const { return name; }
   uint16_t get_birth_year() const { return birth_year; }
   wstring get_address() const { return address; }
   wstring get_passport_number() const { return passport_number; }
@@ -34,7 +38,9 @@ class Sim {
   bool is_sim_issue_user;
 
 public:
-  Sim(string number, wstring tariff, uint16_t issue_year, bool is_exist);
+  Sim(wstring number, wstring tariff, uint16_t issue_year, bool is_exist)
+      : number(number), tariff(tariff), issue_year(issue_year),
+        is_sim_issue_user(is_exist) {}
   wstring get_number() const { return number; }
   wstring get_tariff() const { return tariff; }
   uint16_t get_issue_year() const { return issue_year; }
@@ -49,8 +55,11 @@ class SimRegistation {
   wstring expiration_date;
 
 public:
-  SimRegistation(string sim_number, string passport_number,
-                 wstring registration_date, wstring expiration_date);
+  SimRegistation(wstring sim_number, wstring passport_number,
+                 wstring registration_date, wstring expiration_date)
+      : sim_number(sim_number), passport_number(passport_number),
+        registration_date(registration_date), expiration_date(expiration_date) {
+  }
   wstring get_sim_number() const { return sim_number; }
   wstring get_passport_number() const { return passport_number; }
   wstring get_registration_date() const { return registration_date; }
