@@ -9,7 +9,7 @@ namespace algo {
 
 // Хеш-функция строк
 // Использует побитовое исключающее ИЛИ.
-uint32_t string_hash(std::string key) {
+uint32_t wstring_hash(std::wstring key) {
   uint16_t h = 0;
   for (auto &ch : key)
     h ^= int((ch - ' ') * UINT32_MAX / (127 - ' '));

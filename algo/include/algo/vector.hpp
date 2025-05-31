@@ -147,7 +147,9 @@ template <class T> void vector<T>::erase(size_t index) {
 }
 
 template <class T> void vector<T>::clear() {
-  delete[] array;
+  if (array)
+    delete[] array;
+  array = nullptr;
   vec_capacity = 0;
   vec_size = 0;
   reserve(10);

@@ -29,6 +29,7 @@ set(public_headers
 set(sources
   ${public_headers}
   src/hash.cpp
+  src/search.cpp
 )
 
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}" FILES ${sources})
