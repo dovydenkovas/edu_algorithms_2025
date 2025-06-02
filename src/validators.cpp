@@ -1,5 +1,6 @@
 #include "validators.h"
 #include <cctype>
+#include <filesystem>
 #include <string>
 #include <ctime>
 
@@ -21,7 +22,7 @@ bool is_valid_name(std::wstring name) {
     return false;
 
   for (auto &ch : name)
-    if (!(isalpha(ch) || is_cyrillic(ch) || ch == L'-'))
+    if (!(isalpha(ch) || is_cyrillic(ch) || ch == ' '|| ch == L'-'))
       return false;
 
   return true;

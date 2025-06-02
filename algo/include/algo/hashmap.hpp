@@ -42,6 +42,7 @@ public:
   bool contains(K key) const;
   void insert(K key, V value);
   void erase(K key);
+  void clear();
 
   iterator begin() {
     auto it = data.begin();
@@ -183,6 +184,16 @@ void hashmap<K, V, hash>::erase(K key) {
   delete data[index];
   data[index] = removed;
   --keys_count;
+}
+
+// Удаляет все элементы из таблицы.
+template <class K, class V, uint32_t hash(K)>
+void hashmap<K, V, hash>::clear() {
+  for (auto &item: data)
+    delete item;
+  data.fill(nil);
+  data.resize(16);
+  keys_count = 0;
 }
 
 // Возвращает true, если ключ есть в таблице.

@@ -16,7 +16,6 @@ class Operator {
   UITable *table;
   UIForms *forms;
 
-  bool is_match_pattern(wstring str, wstring pattern);
 
 
 public:
@@ -26,7 +25,7 @@ public:
   void add_user(User user);
 
   // Снятие с обслуживания клиента.
-  void remove_user(std::wstring passport);
+  void remove_user(wstring passport);
 
   // Просмотр всех зарегистрированных клиентов.
   void show_all_users();

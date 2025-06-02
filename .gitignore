@@ -4,3 +4,7 @@ build*
 a.out
 compile_commands.json
 **dist**
+_minted**
+**.pdf
+listings.*
+.$**

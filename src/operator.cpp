@@ -1,6 +1,7 @@
 #include "operator.h"
 #include "entities.h"
 #include <algo/list.hpp>
+#include <algo/search.h>
 #include <sstream>
 
 // Регистрация нового клиента.
@@ -91,7 +92,7 @@ void Operator::find_user(wstring passport_number) {
     algo::vector<wstring> title{L"Номер паспорта", L"Имя клиента",
                                   L"Год рождения", L"Адрес"};
     for (auto &[id, user]: users) {
-    if (is_match_pattern(user.get_name(), pattern) || is_match_pattern(user.get_address(), pattern)) {
+    if (algo::search(user.get_name(), pattern) || algo::search(user.get_address(), pattern)) {
         wstring passport = user.get_passport_number();
         wstring name = user.get_name();
         wstringstream year;
@@ -129,7 +130,10 @@ void Operator::find_user(wstring passport_number) {
   }
 
   // Очистку данных о SIM-картах;
-  void Operator::remove_all_sim() {}
+  void Operator::remove_all_sim() {
+    sims.clear();
+    registrations.clear();
+  }
 
   // Поиск SIM-карты по «номеру SIM-карты».
   // Результаты поиска – все сведения о найденной SIM-карте, а также ФИО и номер
