@@ -1,0 +1,65 @@
+ \documentclass[a4paper,12pt]{article}
+
+\usepackage[T2A]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english,russian]{babel}
+\usepackage{cmap}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage[left=3.0cm, right=1.5cm, top=2.0cm, bottom=2.0cm]{geometry}
+\usepackage{setspace}
+\usepackage{scrextend}
+\usepackage[most]{tcolorbox}
+\usepackage[normalem]{ulem}
+\usepackage{subcaption}
+\usepackage{graphicx}
+\usepackage{titlesec}
+\usepackage{amsmath}
+
+
+\usepackage{fontspec}
+\setmainfont{Times New Roman}
+\setmonofont{Noto Mono}
+
+
+% Оформление кода
+\usepackage{minted}
+\usepackage{xcolor}
+\usemintedstyle{borland}
+
+% Подписи рисунков, таблиц и листингов 
+\captionsetup[lstlisting]{labelsep=endash,figureposition=top,hangindent=\linewidth}
+\renewcommand\lstlistingname{Листинг}
+
+\lstnewenvironment{code}[1][]%
+{\noindent\minipage{\linewidth}\medskip 
+	\lstset{basicstyle=\ttfamily\footnotesize,frame=single,#1}}
+{\endminipage}
+
+
+
+% Общие правила оформления
+\linespread{1.5}
+\setlength\parindent{1.25cm}
+\pretolerance10000
+
+
+
+% Стиль заголовка введения, заключения и т.д.
+\titleformat{\section}[display]
+{\normalfont\bfseries\fontsize{12}{12}\centering}{}{1em}{}
+
+
+
+
+\titlespacing{\section}
+{1.25cm}{6pt}{6pt}
+\titlespacing{\subsection}
+{1.25cm}{6pt}{6pt}
+\titlespacing{\subsubsection}
+{1.25cm}{6pt}{6pt}
+
+
+\begin{document} 
+	\section*{ПРИЛОЖЕНИЕ А \\ Исходный код}
+
