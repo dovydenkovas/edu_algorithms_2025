@@ -75,3 +75,10 @@ bool is_valid_sim_number(std::wstring number) {
 bool is_valid_issue_year(uint16_t year) {
   return 2000 <= year && year <= current_year();
 }
+
+// Проверка имени файл. Открывает файл для чтения.
+bool is_valid_filename(std::wstring filename) {
+  std::filesystem::path fname(filename);
+  std::ifstream file{fname};
+  return (file.is_open() || !std::filesystem::exists(fname)) && !std::filesystem::is_directory(fname);
+}

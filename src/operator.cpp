@@ -165,6 +165,12 @@ void Operator::find_user(wstring passport_number) {
   }
 
 
-bool Operator::is_match_pattern(wstring str, wstring pattern) {
-  return false;
-}
+  // Открыть файл базы данных.
+  void Operator::open(wstring filename) {
+
+  }
+
+  // Сохранить базу данных в файл.
+  void Operator::save(wstring filename) {
+
+  }

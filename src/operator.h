@@ -70,4 +70,10 @@ public:
 
   // регистрацию возврата SIM-карты от клиента.
   void remove_registration_sim(wstring passport_number, wstring sim_number);
+
+  // Открыть файл базы данных.
+  void open(wstring filename);
+
+  // Сохранить базу данных в файл.
+  void save(wstring filename);
 };
