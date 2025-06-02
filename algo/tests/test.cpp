@@ -2,6 +2,7 @@
 #include "list_test.cpp"
 #include "hashmap_test.cpp"
 #include "map_test.cpp"
+#include "search_test.cpp"
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 

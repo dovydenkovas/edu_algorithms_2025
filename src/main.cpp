@@ -1,18 +1,18 @@
 #include "operator.h"
-#include "gui/table.h"
-#include "gui/forms.h"
-#include "gui/mainwindow.h"
+#include "tui/table.h"
+#include "tui/forms.h"
+#include "tui/application.h"
 #include "userinterface.h"
 
 
 int main() {
   std::setlocale(LC_ALL, "");
-  UITable *table = new GuiTable;
+  UITable *table = new TuiTable;
   UIForms *forms = new GuiForms;
 
   Operator op(table, forms);
-  GuiMainWindow main_window(&op, forms);
-  main_window.exec();
+  TuiApplication app(&op, forms);
+  app.exec();
 
   delete forms;
   delete table;
