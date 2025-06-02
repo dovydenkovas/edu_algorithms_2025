@@ -1,17 +1,18 @@
-#include "mainwindow.h"
+#include "application.h"
 #include "../entities.h"
 #include "../input.hpp"
 #include "../validators.h"
+#include <cstdlib>
 #include <exception>
 #include <string>
 
-GuiMainWindow::GuiMainWindow(Operator *op, UIForms *forms)
+TuiApplication::TuiApplication(Operator *op, UIForms *forms)
     : op{op}, forms{forms} {}
 
-void GuiMainWindow::exec() {
+void TuiApplication::exec() {
   while (true) {
     size_t action = input(labels::main_menu_actions, labels::out_of_range_error,
-                          in_range<1, 12>) -
+                          in_range<1, 15>) -
                     1;
     main_menu_run[action](op);
   }
@@ -156,4 +157,30 @@ void del_user_sim(Operator *op) {
       break;
     }
   }
+}
+
+
+void open_database(Operator *op) {
+  wstring filename = input(labels::filename_to_open, labels::open_file_error, is_valid_filename);
+  try {
+    op->open(filename);
+  } catch (exception &e) {
+    std::wcout << labels::open_file_error << std::endl;
+  }
+}
+
+void save_database(Operator *op) {
+  wstring filename = input(labels::filename_to_save, labels::open_file_error, is_valid_filename);
+  try {
+    op->save(filename);
+  } catch (exception &e) {
+    std::wcout << labels::open_file_error << std::endl;
+  }
+}
+
+void exit_op(Operator *op) {
+  wstring need_save = input(labels::need_save, labels::enter_yes_or_no, is_valid_yes_no);
+  if (is_yes(need_save))
+    save_database(op);
+  exit(0);
 }

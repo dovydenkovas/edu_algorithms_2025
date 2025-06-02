@@ -30,7 +30,11 @@ SIM-карты:
   10) поиск карты по тарифу
 
   11) выдать карту клиенту
-  12) вернуть карту оператору)===";
+  12) вернуть карту оператору
+
+  13) открыть базу данных
+  14) сохранить базу данных
+  15) выход)===";
 
 
   label default_error = L"Проверьте корректность введенной строки.";
@@ -58,6 +62,13 @@ SIM-карты:
   label sim_exist = L"SIM-карта уже существует.";
   label sim_not_exist = L"SIM-карта с указанным номером не существует.";
 
+  label filename_to_open = L"Укажите имя файла для открытия базы данных.";
+  label filename_to_save = L"Укажите имя файла для сохранения базы данных.";
+  label open_file_error = L"Не могу открыть файл. Ошибка в имени файла или недостаточно прав.";
+
+  label need_save = L"Все несохраненные изменения будут утеряны. Желаете сохранить базу?";
+  label enter_yes_or_no = L"Необходимо ввести да или нет.";
+
 } // namespace labels
 
 void add_user(Operator *op);
@@ -72,12 +83,15 @@ void search_sim_by_number(Operator *op);
 void search_sim_by_tarif(Operator *op);
 void reg_user_sim(Operator *op);
 void del_user_sim(Operator *op);
+void open_database(Operator *op);
+void save_database(Operator *op);
+void exit_op(Operator *op);
 
 template <size_t first, size_t last> bool in_range(size_t n) {
   return n >= first && n <= last;
 }
 
-class GuiMainWindow {
+class TuiApplication {
   Operator *op;
   UIForms *forms;
 
@@ -93,9 +107,13 @@ class GuiMainWindow {
       search_sim_by_number,
       search_sim_by_tarif,
       reg_user_sim,
-      del_user_sim};
+      del_user_sim,
+      open_database,
+      save_database,
+      exit_op,
+  };
 
 public:
-  GuiMainWindow(Operator *op, UIForms *forms);
+  TuiApplication(Operator *op, UIForms *forms);
   void exec();
 };

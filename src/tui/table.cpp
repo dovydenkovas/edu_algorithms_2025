@@ -4,25 +4,25 @@
 
 // GuiTable::GuiTable() {}
 
-void GuiTable::clear() {
+void TuiTable::clear() {
   title.clear();
   rows.clear();
   column_width.clear();
 }
 
-void GuiTable::set_title(algo::vector<std::wstring> &t) {
+void TuiTable::set_title(algo::vector<std::wstring> &t) {
   clear();
   title = t;
 }
 
-void GuiTable::add_row(algo::vector<std::wstring> &row) {
+void TuiTable::add_row(algo::vector<std::wstring> &row) {
   if (row.size() != title.size())
     throw std::runtime_error(
         "Ошибка формата таблицы. В строке неправильное количество столбцов.");
   rows.push_back(row);
 }
 
-void GuiTable::render() {
+void TuiTable::render() {
   calculate_table_width();
   render_line();
   render_title();
@@ -31,7 +31,7 @@ void GuiTable::render() {
   render_line();
 }
 
-void GuiTable::calculate_table_width() {
+void TuiTable::calculate_table_width() {
   // Определяет максимальную ширину элементов каждого столбца
   for (size_t i = 0; i < title.size(); ++i)
     column_width.push_back(title[i].size());
@@ -41,7 +41,7 @@ void GuiTable::calculate_table_width() {
         column_width[j] = rows[i][j].size();
 }
 
-void GuiTable::render_line() {
+void TuiTable::render_line() {
   // Горизонтальная черта
   std::wcout << "+";
   for (size_t i = 0; i < title.size(); ++i) {
@@ -53,7 +53,7 @@ void GuiTable::render_line() {
   std::wcout.fill(L' ');
 }
 
-void GuiTable::render_title() {
+void TuiTable::render_title() {
   // Заголовок таблицы
   std::wcout << "| ";
   for (size_t i = 0; i < title.size(); ++i) {
@@ -64,7 +64,7 @@ void GuiTable::render_title() {
   std::wcout << std::endl;
 }
 
-void GuiTable::render_body() {
+void TuiTable::render_body() {
   // Тело таблицы
   std::wcout.fill(L' ');
   for (size_t i = 0; i < rows.size(); ++i) {
@@ -78,4 +78,4 @@ void GuiTable::render_body() {
   }
 }
 
-GuiTable::~GuiTable() {}
+TuiTable::~TuiTable() {}

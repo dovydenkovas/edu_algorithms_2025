@@ -2,7 +2,7 @@
 #include "../userinterface.h"
 #include <string>
 
-class GuiTable: public virtual UITable {
+class TuiTable: public virtual UITable {
   algo::vector<std::wstring> title;
   algo::vector<algo::vector<std::wstring>> rows;
   algo::vector<size_t> column_width;
@@ -13,10 +13,9 @@ class GuiTable: public virtual UITable {
   void render_body();
 
 public:
-  // GuiTable();
   void clear() override;
   void set_title(algo::vector<std::wstring> &t) override;
   void add_row(algo::vector<std::wstring> &r) override;
   void render() override;
-  ~GuiTable() override;
+  ~TuiTable() override;
 };
