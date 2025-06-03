@@ -115,18 +115,36 @@ void Operator::find_user(wstring passport_number) {
 
   // Удаление сведений о SIM-карте
   void Operator::remove_sim(wstring number) {
+    if (!sims.contains(number))
+      return;
     // При удалении сведений о SIM-карте должны быть учтены и обработаны
-    // ситуации, когда эта SIM-карта уже выдана клиенту. Аналогичным образом
-    // следует поступать и с удалением данных о клиентах.
+    // ситуации, когда эта SIM-карта уже выдана клиенту.
+    for (auto it = registrations.begin(); it != registrations.end(); ++it) {
+       if ((*it).get_sim_number() == number) {
+        registrations.erase(it);
+        break;
+       }
+    }
 
-
+    sims.erase(number);
   }
 
   // Просмотр всех имеющихся SIM-карт;
   void Operator::show_all_sim() {
-    //  Состав данных о клиенте или SIM-карте, выдаваемых при просмотре всех
-    //  зарегистрированных клиентов или просмотре всех SIM-карт, определяется
-    //  студентом самостоятельно, но должен содержать не менее двух полей.
+    table->clear();
+    algo::vector<wstring> title{L"Номер карты", L"Тариф",
+                                  L"Год выпуска карты", L"Выдана ли карта"};
+    table->set_title(title);
+    for (auto [id, sim]: sims) {
+      wstring number = sim.get_number();
+      wstring tariff = sim.get_tariff();
+      wstring is_sim_issue_user = sim.is_issue() ? L"Выдана" : L"Не выдана";
+      wstringstream year;
+      year << sim.get_issue_year();
+      algo::vector<wstring> row{number, tariff, year.str(), is_sim_issue_user};
+      table->add_row(row);
+    }
+    table->render();
   }
 
   // Очистку данных о SIM-картах;
@@ -138,7 +156,37 @@ void Operator::find_user(wstring passport_number) {
   // Поиск SIM-карты по «номеру SIM-карты».
   // Результаты поиска – все сведения о найденной SIM-карте, а также ФИО и номер
   // паспорта клиента, которому выдана эта SIM-карта;
-  void Operator::find_sim(wstring sim_number) {}
+  void Operator::find_sim(wstring sim_number) {
+    table->clear();
+    algo::vector<wstring> title{L"Номер карты", L"Тариф",
+                                  L"Год выпуска", L"Дата выдачи", L"Срок действия истекает", L"ФИО клиента", L"Номер паспорта"};
+    table->set_title(title);
+    if (sims.contains(sim_number)) {
+      auto sim = sims[sim_number];
+      wstring number = sim.get_number();
+      wstring tariff = sim.get_tariff();
+      wstring date_of_reg = L"Карта не выдана";
+      wstring date_of_exp = L"";
+      wstring username = L"";
+      wstring passport = L"";
+      if (sim.is_issue()) {
+        for (auto reg: registrations) {
+          if (reg.get_sim_number() == sim_number) {
+            date_of_reg = reg.get_registration_date();
+            date_of_exp = reg.get_expiration_date();
+            username = users[reg.get_passport_number()].get_name();
+            passport = users[reg.get_passport_number()].get_passport_number();
+            break;
+          }
+        }
+      }
+      wstringstream year;
+      year << sim.get_issue_year();
+      algo::vector<wstring> row{number, tariff, year.str(), date_of_reg, date_of_exp, username, passport};
+      table->add_row(row);
+    }
+    table->render();
+  }
 
   // Поиск SIM-карты по тарифу. Результаты поиска – список найденных SIM-карт с
   // указанием «номера SIM-карты», тарифа, года выпуска;
