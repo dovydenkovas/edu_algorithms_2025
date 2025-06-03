@@ -56,6 +56,16 @@ TEST(list, iterator) {
   }
 }
 
+TEST(list, none_elements_iterator) {
+  list<int> a;
+
+  for (auto i = a.begin(); i != a.end(); ++i) {
+    ASSERT_EQ(*i, 1);
+    a.erase(i);
+  }
+}
+
+
 TEST(list, inserterase) {
   list<int> a;
   for (int i = 0; i < 10; ++i)

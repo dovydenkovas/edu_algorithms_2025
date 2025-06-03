@@ -39,7 +39,7 @@ public:
   void clear();
   void sort();
 
-  iterator begin() const { return iterator{first, first, false}; }
+  iterator begin() const { return size() > 0 ? iterator{first, first, false} : end(); }
   iterator end() const { return iterator{last, first, true}; }
 
   ~list() { clear(); }
