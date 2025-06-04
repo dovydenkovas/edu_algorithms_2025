@@ -119,7 +119,8 @@ void reg_user_sim(Operator *op) {
                                   labels::add_user_input_passport_number_error,
                                   is_valid_passport_number);
   try {
-    op->registration_sim(passport_number, sim_number);
+    throw "todo";
+    // op->registration_sim(passport_number, sim_number);
   } catch (Error &e) {
     switch (e) {
     case Error::UserNotExist:
@@ -165,7 +166,7 @@ void open_database(Operator *op) {
   try {
     op->open(filename);
   } catch (exception &e) {
-    std::wcout << labels::open_file_error << std::endl;
+    std::wcout << labels::open_file_error << L": " << e.what() << std::endl;
   }
 }
 

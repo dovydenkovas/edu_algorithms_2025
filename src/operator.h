@@ -65,7 +65,7 @@ public:
   void find_sims(wstring pattern);
 
   // Регистрацию выдачи клиенту SIM-карты;
-  void registration_sim(wstring passport_number, wstring sim_number);
+  void registration_sim(SimRegistation simreg);
 
   // регистрацию возврата SIM-карты от клиента.
   void remove_registration_sim(wstring passport_number, wstring sim_number);

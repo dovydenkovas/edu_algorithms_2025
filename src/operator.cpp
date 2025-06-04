@@ -2,7 +2,15 @@
 #include "entities.h"
 #include <algo/list.hpp>
 #include <algo/search.h>
+#include <fstream>
+#include <filesystem>
+#include <iostream>
+#include <locale>
 #include <sstream>
+#include <stdexcept>
+#include "validators.h"
+#include <locale.h>
+#include <codecvt>
 
 // Регистрация нового клиента.
 void Operator::add_user(User user) {
@@ -133,7 +141,7 @@ void Operator::find_user(wstring passport_number) {
   void Operator::show_all_sim() {
     table->clear();
     algo::vector<wstring> title{L"Номер карты", L"Тариф",
-                                  L"Год выпуска карты", L"Выдана ли карта"};
+                                  L"Год выпуска", L"Выдана ли карта"};
     table->set_title(title);
     for (auto [id, sim]: sims) {
       wstring number = sim.get_number();
@@ -196,7 +204,7 @@ void Operator::find_user(wstring passport_number) {
   }
 
   // Регистрацию выдачи клиенту SIM-карты;
-  void Operator::registration_sim(wstring passport_number, wstring sim_number) {
+  void Operator::registration_sim(SimRegistation simreg) {
     // Регистрация выдачи SIM-карты клиенту должна осуществляться только при
     // наличии SIM-карты у оператора сотовой связи (значение поля «Признак
     // наличия» для соответствующей SIM-карты имеет значение «Истина»). При
@@ -216,13 +224,123 @@ void Operator::find_user(wstring passport_number) {
     // соответствующей SIM-карты.
   }
 
+// Прочитать запись о пользователе из строки.
+User parse_user(const wstring line) {
+  wistringstream buff{line};
+  wstring passport_number;
+  getline(buff, passport_number, L';');
 
-  // Открыть файл базы данных.
-  void Operator::open(wstring filename) {
+  wstring name;
+  getline(buff, name, L';');
 
+  wstring year;
+  getline(buff, year, L';');
+
+  wistringstream year_stream{year};
+  uint16_t birth_year;
+  year_stream >> birth_year;
+
+  wstring address;
+  getline(buff, address, L';');
+
+  wstring passport_date_of_issue;
+  getline(buff, passport_date_of_issue);
+
+  if (is_valid_passport_number(passport_number) && is_valid_name(name) && is_valid_birth_year(birth_year))
+    return User{name, birth_year, address, passport_number, passport_date_of_issue};
+  throw runtime_error("User.");
+}
+
+// Прочитать запись о SIM-карте из строки.
+Sim parse_sim(const wstring line) {
+  wistringstream buff{line};
+  wstring number;
+  getline(buff, number, L';');
+
+  wstring tariff;
+  getline(buff, tariff, L';');
+
+  wstring year;
+  getline(buff, year);
+  wistringstream year_stream{year};
+  uint16_t issue_year;
+  year_stream >> issue_year;
+
+  if (is_valid_sim_number(number) && is_valid_issue_year(issue_year))
+    return Sim{number, tariff, issue_year, false};
+  throw runtime_error("Sim.");
+}
+
+// Прочитать запись о регистрации из строки.
+SimRegistation parse_registration(const wstring line) {
+  wistringstream buff{line};
+  wstring sim_number;
+  getline(buff, sim_number, L';');
+
+  wstring passport_number;
+  getline(buff, passport_number, L';');
+
+  wstring registration_date;
+  getline(buff, registration_date, L';');
+
+  wstring expiration_date;
+  getline(buff, expiration_date);
+
+  if (is_valid_sim_number(sim_number) && is_valid_passport_number(passport_number))
+      return SimRegistation{sim_number, passport_number, registration_date, expiration_date};
+    throw runtime_error("Reg.");
+}
+
+// Открыть файл базы данных.
+void Operator::open(const wstring filename) {
+  sims.clear();
+  users.clear();
+  registrations.clear();
+
+  wifstream ifile{std::filesystem::path{filename}};
+  ifile.imbue(std::locale(locale(), new std::codecvt_utf8<wchar_t>));
+
+  enum {NONE, USERS, SIMS, REGISTRATIONS} state;
+  state = NONE;
+  wstring line;
+  getline(ifile, line);
+  while (!ifile.eof()) {
+    // Если строка задает название секции
+    if (line == L"") {}
+    else if (line == L"[users]") state = USERS;
+    else if (line == L"[sims]") state = SIMS;
+    else if (line == L"[regs]") state = REGISTRATIONS;
+    else {
+      // Если строка содержит запись, принадлежащую секции
+      if (state == USERS) add_user(parse_user(line));
+      else if (state == SIMS) add_sim(parse_sim(line));
+      else if (state == REGISTRATIONS) registration_sim(parse_registration(line));
+      else throw std::runtime_error("None section.");
+    }
+  getline(ifile, line);
   }
+}
 
-  // Сохранить базу данных в файл.
-  void Operator::save(wstring filename) {
+// Сохранить базу данных в файл.
+void Operator::save(wstring filename) {
+ wofstream ofile{std::filesystem::path{filename}};
+ ofile.imbue(std::locale(locale(), new std::codecvt_utf8<wchar_t>));
+ ofile << "[users]" << endl;
+ for (auto [id, user]: users) {
+   ofile << id << L';' << user.get_name()  << L';'
+   << user.get_birth_year() << L';' << user.get_address() << L';'
+   << user.get_passport_date_of_issue() << endl;
+ }
 
-  }
+ ofile << "[sims]" << endl;
+ for (auto [id, sim]: sims) {
+   ofile << id << L';' << sim.get_tariff()  << L';'
+   << sim.get_issue_year() << endl;
+ }
+
+ ofile << "[regs]" << endl;
+ for (auto reg: registrations) {
+   ofile << reg.get_sim_number() << L';' << reg.get_passport_number()  << L';'
+   << reg.get_registration_date() << L';' << reg.get_expiration_date() << endl;
+ }
+}

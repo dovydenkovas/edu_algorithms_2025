@@ -49,7 +49,7 @@ public:
 };
 
 class SimRegistation {
-  wstring sim_number; // Первычиный ключ
+  wstring sim_number;
   wstring passport_number;
   wstring registration_date;
   wstring expiration_date;
