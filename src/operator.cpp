@@ -30,7 +30,7 @@ void Operator::remove_user(std::wstring passport) {
   // Удалить все карты клиента
   for (auto reg = registrations.begin(); reg != registrations.end();)
     if ((*reg).get_passport_number() == passport) {
-      sims[(*reg).get_sim_number()].issue(false); // Симка не выдана.
+      sims[(*reg).get_sim_number()].free(true); // Симка не выдана.
       registrations.erase(reg); // Удалить запись о выдаче.
     } else
       ++reg;
@@ -146,7 +146,7 @@ void Operator::find_user(wstring passport_number) {
     for (auto [id, sim]: sims) {
       wstring number = sim.get_number();
       wstring tariff = sim.get_tariff();
-      wstring is_sim_issue_user = sim.is_issue() ? L"Выдана" : L"Не выдана";
+      wstring is_sim_issue_user = sim.is_free() ? L"Не выдана" : L"Выдана";
       wstringstream year;
       year << sim.get_issue_year();
       algo::vector<wstring> row{number, tariff, year.str(), is_sim_issue_user};
@@ -177,7 +177,7 @@ void Operator::find_user(wstring passport_number) {
       wstring date_of_exp = L"";
       wstring username = L"";
       wstring passport = L"";
-      if (sim.is_issue()) {
+      if (!sim.is_free()) {
         for (auto reg: registrations) {
           if (reg.get_sim_number() == sim_number) {
             date_of_reg = reg.get_registration_date();
@@ -214,6 +214,15 @@ void Operator::find_user(wstring passport_number) {
     //
     // 2. Одному клиенту может быть выдано несколько SIM-карт. Таким образом,
     // могут быть данные, имеющие повторяющиеся значения в своих полях.
+
+    if (!users.contains(simreg.get_passport_number()))
+      throw Error::UserNotExist;
+    if (!sims.contains(simreg.get_sim_number()))
+      throw Error::SimNotExist;
+
+    auto &sim = sims[simreg.get_sim_number()];
+    sim.free(false);
+    registrations.push_back(simreg);
   }
 
   // регистрацию возврата SIM-карты от клиента.
@@ -267,7 +276,7 @@ Sim parse_sim(const wstring line) {
   year_stream >> issue_year;
 
   if (is_valid_sim_number(number) && is_valid_issue_year(issue_year))
-    return Sim{number, tariff, issue_year, false};
+    return Sim{number, tariff, issue_year, true};
   throw runtime_error("Sim.");
 }
 

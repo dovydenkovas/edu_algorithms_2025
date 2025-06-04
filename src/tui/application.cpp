@@ -76,10 +76,10 @@ void add_sim(Operator *op) {
   uint16_t issue_year =
       input(labels::add_sim_input_year, labels::add_sim_input_year_error,
             is_valid_issue_year);
-  bool is_exist = false;
+  bool is_free = true;
 
   try {
-    op->add_sim(Sim(number, tariff, issue_year, is_exist));
+    op->add_sim(Sim(number, tariff, issue_year, is_free));
   } catch (Error &e) {
     wcout << labels::sim_exist << endl;
   }

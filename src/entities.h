@@ -35,17 +35,17 @@ class Sim {
   wstring number;
   wstring tariff;
   uint16_t issue_year;
-  bool is_sim_issue_user;
+  bool is_sim_free;
 
 public:
-  Sim(wstring number, wstring tariff, uint16_t issue_year, bool is_exist)
+  Sim(wstring number, wstring tariff, uint16_t issue_year, bool is_free)
       : number(number), tariff(tariff), issue_year(issue_year),
-        is_sim_issue_user(is_exist) {}
+        is_sim_free(is_free) {}
   wstring get_number() const { return number; }
   wstring get_tariff() const { return tariff; }
   uint16_t get_issue_year() const { return issue_year; }
-  bool is_issue() const { return is_sim_issue_user; }
-  void issue(bool i) { is_sim_issue_user = i; }
+  bool is_free() const { return is_sim_free; }
+  void free(bool i) { is_sim_free = i; }
 };
 
 class SimRegistation {
