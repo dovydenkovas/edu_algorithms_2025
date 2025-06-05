@@ -4,7 +4,10 @@
 #include "../validators.h"
 #include <cstdlib>
 #include <exception>
+#include <iostream>
 #include <string>
+
+
 
 TuiApplication::TuiApplication(Operator *op, UIForms *forms)
     : op{op}, forms{forms} {}
@@ -15,7 +18,13 @@ void TuiApplication::exec() {
                           in_range<1, 17>) -
                     1;
     main_menu_run[action](op);
+    pause();
   }
+}
+
+void pause() {
+  std::wcout << labels::pause << std::endl;
+  wcin.get();
 }
 
 void add_user(Operator *op) {
@@ -132,9 +141,10 @@ void reg_user_sim(Operator *op) {
   wstring passport_number = input(labels::input_passport_number,
                                   labels::input_passport_number_error,
                                   is_valid_passport_number);
+  wstring reg_date = input<wstring>(labels::input_registration_date, labels::default_error);
+  wstring exp_date = input<wstring>(labels::input_expiration_date, labels::default_error);
   try {
-    throw "todo";
-    // op->registration_sim(passport_number, sim_number);
+    op->registration_sim(SimRegistation{sim_number, passport_number, reg_date, exp_date});
   } catch (Error &e) {
     switch (e) {
     case Error::UserNotExist:
@@ -154,11 +164,8 @@ void del_user_sim(Operator *op) {
   wstring sim_number =
       input(labels::add_sim_input_number, labels::add_sim_input_number_error,
             is_valid_sim_number);
-  wstring passport_number = input(labels::input_passport_number,
-                                  labels::input_passport_number_error,
-                                  is_valid_passport_number);
   try {
-    op->remove_registration_sim(passport_number, sim_number);
+    op->remove_registration_sim(sim_number);
   } catch (Error &e) {
     switch (e) {
     case Error::UserNotExist:

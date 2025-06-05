@@ -93,8 +93,10 @@ void Operator::find_user(wstring passport_number) {
     // Для обнаружения заданного фрагмента в полном ФИО или адресе должен
     // применяться алгоритм поиска слова в тексте, указанный в варианте задания.
 
+    table->clear();
     algo::vector<wstring> title{L"Номер паспорта", L"Имя клиента",
                                   L"Год рождения", L"Адрес"};
+    table->set_title(title);
     for (auto &[id, user]: users) {
     if (algo::search(user.get_name(), pattern) || algo::search(user.get_address(), pattern)) {
         wstring passport = user.get_passport_number();
@@ -106,8 +108,8 @@ void Operator::find_user(wstring passport_number) {
         algo::vector<wstring> row{passport, name, year.str(), address};
         table->add_row(row);
       }
-      table->render();
     }
+    table->render();
   }
 
   // Добавление новой SIM-карты
@@ -221,8 +223,7 @@ void Operator::find_user(wstring passport_number) {
   }
 
   // регистрацию возврата SIM-карты от клиента.
-  void Operator::remove_registration_sim(wstring passport_number,
-                                         wstring sim_number) {
+  void Operator::remove_registration_sim(wstring sim_number) {
     // При регистрации выдачи SIM-карты клиенту или возврата SIM-карты клиентом
     // должно корректироваться значение поля «Признак наличия» для
     // соответствующей SIM-карты.
