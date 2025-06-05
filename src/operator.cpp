@@ -198,6 +198,20 @@ void Operator::find_user(wstring passport_number) {
   void Operator::find_sims(wstring pattern) {
     // Метод поиска SIM-карты по тарифу определяется студентом самостоятельно.
     // Выбранный метод необходимо сравнить с альтернативными методами.
+    table->clear();
+    algo::vector<wstring> title{L"Номер карты", L"Тариф", L"Год выпуска"};
+    table->set_title(title);
+    for (auto [id, sim]: sims) {
+      wstring tariff = sim.get_tariff();
+      if (algo::search(tariff, pattern)) {
+        wstring number = sim.get_number();
+        wstringstream year;
+        year << sim.get_issue_year();
+        algo::vector<wstring> row{number, tariff, year.str()};
+        table->add_row(row);
+      }
+    }
+    table->render();
   }
 
   // Регистрацию выдачи клиенту SIM-карты;
