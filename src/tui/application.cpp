@@ -12,7 +12,7 @@ TuiApplication::TuiApplication(Operator *op, UIForms *forms)
 void TuiApplication::exec() {
   while (true) {
     size_t action = input(labels::main_menu_actions, labels::out_of_range_error,
-                          in_range<1, 15>) -
+                          in_range<1, 17>) -
                     1;
     main_menu_run[action](op);
   }
@@ -27,8 +27,8 @@ void add_user(Operator *op) {
             is_valid_birth_year);
   wstring address = input_line<wstring>(labels::add_user_input_address,
                                         labels::add_user_input_address_error);
-  wstring passport_number = input(labels::add_user_input_passport_number,
-                                  labels::add_user_input_passport_number_error,
+  wstring passport_number = input(labels::input_passport_number,
+                                  labels::input_passport_number_error,
                                   is_valid_passport_number);
   wstring passport_date = input_line<wstring>(
       labels::input_passport_date_of_issue, labels::default_error);
@@ -42,8 +42,8 @@ void add_user(Operator *op) {
 }
 
 void del_user(Operator *op) {
-  wstring passport_number = input(labels::add_user_input_passport_number,
-                                  labels::add_user_input_passport_number_error,
+  wstring passport_number = input(labels::input_passport_number,
+                                  labels::input_passport_number_error,
                                   is_valid_passport_number);
   try {
     op->remove_user(passport_number);
@@ -61,7 +61,14 @@ void clear_users(Operator *op) {
     op->remove_all_users();
 }
 
-void search_user(Operator *op) {
+void search_user_by_passport(Operator *op) {
+  std::wstring number  =
+      input_line(labels::input_passport_number, labels::input_passport_number_error, is_valid_passport_number);
+  op->find_user(number);
+}
+
+
+void search_user_by_name(Operator *op) {
   std::wstring pattern =
       input_line<std::wstring>(labels::search_user, labels::default_error);
   op->find_users(pattern);
@@ -98,6 +105,13 @@ void del_sim(Operator *op) {
 
 void show_sims(Operator *op) { op->show_all_sim(); }
 
+void clear_sims(Operator *op) {
+  wstring yes_no =
+      input(labels::are_you_sure, labels::are_you_sure_error, is_valid_yes_no);
+  if (is_yes(yes_no))
+    op->remove_all_sim();
+}
+
 void search_sim_by_number(Operator *op) {
   wstring number =
       input(labels::add_sim_input_number, labels::add_sim_input_number_error,
@@ -115,8 +129,8 @@ void reg_user_sim(Operator *op) {
   wstring sim_number =
       input(labels::add_sim_input_number, labels::add_sim_input_number_error,
             is_valid_sim_number);
-  wstring passport_number = input(labels::add_user_input_passport_number,
-                                  labels::add_user_input_passport_number_error,
+  wstring passport_number = input(labels::input_passport_number,
+                                  labels::input_passport_number_error,
                                   is_valid_passport_number);
   try {
     throw "todo";
@@ -140,8 +154,8 @@ void del_user_sim(Operator *op) {
   wstring sim_number =
       input(labels::add_sim_input_number, labels::add_sim_input_number_error,
             is_valid_sim_number);
-  wstring passport_number = input(labels::add_user_input_passport_number,
-                                  labels::add_user_input_passport_number_error,
+  wstring passport_number = input(labels::input_passport_number,
+                                  labels::input_passport_number_error,
                                   is_valid_passport_number);
   try {
     op->remove_registration_sim(passport_number, sim_number);

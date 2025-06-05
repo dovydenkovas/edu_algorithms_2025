@@ -2,6 +2,7 @@
 
 #include <string>
 #include <algo/vector.hpp>
+#include <algo/map.hpp>
 
 class UITable {
 public:
@@ -18,6 +19,9 @@ public:
 
 
 class UIForms {
-  public:
+public:
+  virtual void clear() = 0;
+  virtual void add_value(std::wstring key, std::wstring value) = 0;
+  virtual void render() = 0;
   virtual ~UIForms() {};
 };

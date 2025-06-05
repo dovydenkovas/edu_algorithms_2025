@@ -8,7 +8,7 @@
 int main() {
   std::setlocale(LC_ALL, "");
   UITable *table = new TuiTable;
-  UIForms *forms = new GuiForms;
+  UIForms *forms = new TuiForms;
 
   Operator op(table, forms);
   TuiApplication app(&op, forms);

@@ -20,21 +20,23 @@ label main_menu_actions = LR"===(Выберите действие:
   2) снять с обслуживания
   3) просмотр всех зарегистрированных клиентов
   4) очистить данные о клиентах
-  5) поиск клиента по ФИО или адресу
+  5) поиск клиента по номеру паспорта
+  6) поиск клиента по ФИО или адресу
 
 SIM-карты:
-  6) добавить карту
-  7) удалить карту
-  8) просмотр всех имеющихся карт
-  9) поиск карты по номеру
-  10) поиск карты по тарифу
+  7) добавить карту
+  8) удалить карту
+  9) просмотр всех имеющихся карт
+  10) очистить данные о всех SIM-картах
+  11) поиск карты по номеру
+  12) поиск карты по тарифу
 
-  11) выдать карту клиенту
-  12) вернуть карту оператору
+  13) выдать карту клиенту
+  14) вернуть карту оператору
 
-  13) открыть базу данных
-  14) сохранить базу данных
-  15) выход)===";
+  15) открыть базу данных
+  16) сохранить базу данных
+  17) выход)===";
 
 
   label default_error = L"Проверьте корректность введенной строки.";
@@ -45,8 +47,8 @@ SIM-карты:
   label add_user_input_year_error = L"Год рождения должен быть целым числом не меньшим 1900 и не превышающим 2011.";
   label add_user_input_address = L"Введите адрес клиента.";
   label add_user_input_address_error = L"Адрес может быть произвольной строкой.";
-  label add_user_input_passport_number = L"Введите номер паспорта клиента.";
-  label add_user_input_passport_number_error = L"Номер паспорта – строка формата «NNNN-NNNNNN», где N – цифры.";
+  label input_passport_number = L"Введите номер паспорта клиента.";
+  label input_passport_number_error = L"Номер паспорта – строка формата «NNNN-NNNNNN», где N – цифры.";
   label input_passport_date_of_issue = L"Введите дату выдачи паспорта.";
   label user_exist = L"Пользователь с указанным паспортом уже существует.";
   label user_not_exist = L"Пользователя с указанным паспортом не существует.";
@@ -75,10 +77,12 @@ void add_user(Operator *op);
 void del_user(Operator *op);
 void show_users(Operator *op);
 void clear_users(Operator *op);
-void search_user(Operator *op);
+void search_user_by_passport(Operator *op);
+void search_user_by_name(Operator *op);
 void add_sim(Operator *op);
 void del_sim(Operator *op);
 void show_sims(Operator *op);
+void clear_sims(Operator *op);
 void search_sim_by_number(Operator *op);
 void search_sim_by_tarif(Operator *op);
 void reg_user_sim(Operator *op);
@@ -100,10 +104,12 @@ class TuiApplication {
       del_user,
       show_users,
       clear_users,
-      search_user,
+      search_user_by_passport,
+      search_user_by_name,
       add_sim,
       del_sim,
       show_sims,
+      clear_sims,
       search_sim_by_number,
       search_sim_by_tarif,
       reg_user_sim,

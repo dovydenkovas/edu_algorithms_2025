@@ -67,21 +67,17 @@ void Operator::remove_all_users() {
 // Результаты поиска – все сведения о найденном клиенте и номера SIM-карт,
 // которые ему выданы.
 void Operator::find_user(wstring passport_number) {
-  table->clear();
-  algo::vector<wstring> title{L"Номер паспорта", L"Имя клиента",
-                              L"Год рождения", L"Адрес",
-                              L"Дата выдачи паспорта"};
-  table->set_title(title);
-
   if (users.contains(passport_number)) {
+    forms->clear();
     User &user = users[passport_number];
     wstringstream year;
     year << user.get_birth_year();
-
-    algo::vector<wstring> row{user.get_passport_number(), user.get_name(),
-                              year.str(), user.get_address(), user.get_passport_date_of_issue()};
-    table->add_row(row);
-    table->render();
+    forms->add_value(L"Имя клиента", user.get_name());
+    forms->add_value(L"Номер паспорта", passport_number);
+    forms->add_value(L"Год рождения", year.str());
+    forms->add_value(L"Адрес", user.get_address());
+    forms->add_value(L"Дата выдачи паспорта", user.get_passport_date_of_issue());
+    forms->render();
   }
 }
 
@@ -165,35 +161,34 @@ void Operator::find_user(wstring passport_number) {
   // Результаты поиска – все сведения о найденной SIM-карте, а также ФИО и номер
   // паспорта клиента, которому выдана эта SIM-карта;
   void Operator::find_sim(wstring sim_number) {
-    table->clear();
-    algo::vector<wstring> title{L"Номер карты", L"Тариф",
-                                  L"Год выпуска", L"Дата выдачи", L"Срок действия истекает", L"ФИО клиента", L"Номер паспорта"};
-    table->set_title(title);
+    forms->clear();
     if (sims.contains(sim_number)) {
       auto sim = sims[sim_number];
-      wstring number = sim.get_number();
-      wstring tariff = sim.get_tariff();
-      wstring date_of_reg = L"Карта не выдана";
-      wstring date_of_exp = L"";
-      wstring username = L"";
-      wstring passport = L"";
-      if (!sim.is_free()) {
+      forms->add_value(L"Номер карты", sim.get_number());
+      forms->add_value(L"Тариф", sim.get_tariff());
+      wstringstream year;
+      year << sim.get_issue_year();
+      forms->add_value(L"Год выпуска", year.str());
+
+      if (sim.is_free()) {
+        forms->add_value(L"Регистрация карты", L"Карта не выдана");
+      } else {
+        wstring date_of_reg = L"Карта не выдана";
+        wstring date_of_exp = L"";
+        wstring username = L"";
+        wstring passport = L"";
         for (auto reg: registrations) {
           if (reg.get_sim_number() == sim_number) {
-            date_of_reg = reg.get_registration_date();
-            date_of_exp = reg.get_expiration_date();
-            username = users[reg.get_passport_number()].get_name();
-            passport = users[reg.get_passport_number()].get_passport_number();
+            forms->add_value(L"Дата выдачи", reg.get_registration_date());
+            forms->add_value(L"Срок действия истекает", reg.get_expiration_date());
+            forms->add_value(L"ФИО клиента", users[reg.get_passport_number()].get_name());
+            forms->add_value(L"Номер паспорта", users[reg.get_passport_number()].get_passport_number());
             break;
           }
         }
       }
-      wstringstream year;
-      year << sim.get_issue_year();
-      algo::vector<wstring> row{number, tariff, year.str(), date_of_reg, date_of_exp, username, passport};
-      table->add_row(row);
+      forms->render();
     }
-    table->render();
   }
 
   // Поиск SIM-карты по тарифу. Результаты поиска – список найденных SIM-карт с

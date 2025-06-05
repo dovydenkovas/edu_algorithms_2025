@@ -1,7 +1,11 @@
 #pragma once
 #include "../userinterface.h"
 
-class GuiForms: public UIForms {
+class TuiForms: public UIForms {
+  algo::vector<std::pair<std::wstring, std::wstring>> values;
 public:
-  GuiForms();
+  virtual void clear() override;
+  virtual void add_value(std::wstring key, std::wstring value) override;
+  virtual void render() override;
+  ~TuiForms() {}
 };
