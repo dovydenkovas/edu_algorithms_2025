@@ -31,11 +31,27 @@ label main_menu_actions = LR"===(
                                                      17) выход
 )===";
 
-
   label default_error = L"Проверьте корректность введенных данных.";
 
-  label add_user_input_name = L"Введите имя клиента.";
-  label add_user_input_name_error = L"Имя клиента может содержать только символы криллического и латинского алфавита, дефис и не должно быть длинее 50 символов.";
+  label add_user_header = L"= Регистрация клиента";
+  label del_user_header = L"= Удаление клиента из базы данных";
+  label show_users = L"= Зарегистрированные клиенты";
+  label clear_users = L"= Удаление информации о всех зарегистрированных клиентах";
+  label search_user_by_passport = L"= Поиск клиента по номеру паспорта";
+  label search_user_by_name = L"= Поиск клиента по ФИО или адресу";
+  label add_sim = L"= Добавление новой SIM-карты";
+  label del_sim = L"= Удаление SIM-карты";
+  label show_sims = L"= SIM-карты";
+  label clear_sims = L"= Удалить данные о всех SIM-картах";
+  label search_sim_by_number = L"= Поиск SIM-карты по номеру";
+  label search_sim_by_tarif = L"= Поиск SIM-карты по тарифу";
+  label reg_user_sim = L"= Регистрация выдачи SIM-карты";
+  label del_user_sim = L"= Регистрация возврата SIM-карты";
+  label open_database = L"= Загрузка базы данных из файла";
+  label save_database = L"= Сохранение базы данных в файл";
+
+  label add_user_input_name = L"Введите ФИО клиента.";
+  label add_user_input_name_error = L"ФИО клиента может содержать только символы криллического и латинского алфавита, дефис и не должно быть длинее 50 символов.";
   label add_user_input_year = L"Введите год рождения клиента.";
   label add_user_input_year_error = L"Год рождения должен быть целым числом не меньшим 1900 и не превышающим 2011.";
   label add_user_input_address = L"Введите адрес клиента.";

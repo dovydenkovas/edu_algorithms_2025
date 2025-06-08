@@ -26,6 +26,7 @@ void pause() {
 }
 
 void add_user(Operator *op) {
+  wcout << labels::add_user_header << endl;
   using std::wstring;
   wstring name = input_line(labels::add_user_input_name,
                             labels::add_user_input_name_error, is_valid_name);
@@ -51,6 +52,7 @@ void add_user(Operator *op) {
 }
 
 void del_user(Operator *op) {
+  wcout << labels::del_user_header << endl;
   wstring passport_number =
       input(labels::input_passport_number, labels::input_passport_number_error,
             is_valid_passport_number);
@@ -61,9 +63,13 @@ void del_user(Operator *op) {
   }
 }
 
-void show_users(Operator *op) { op->show_all_users(); }
+void show_users(Operator *op) {
+  wcout << labels::show_users << endl;
+  op->show_all_users();
+}
 
 void clear_users(Operator *op) {
+  wcout << labels::clear_users << endl;
   wstring yes_no =
       input(labels::are_you_sure, labels::are_you_sure_error, is_valid_yes_no);
   if (is_yes(yes_no))
@@ -71,6 +77,7 @@ void clear_users(Operator *op) {
 }
 
 void search_user_by_passport(Operator *op) {
+  wcout << labels::search_user_by_passport << endl;
   std::wstring number =
       input_line(labels::input_passport_number,
                  labels::input_passport_number_error, is_valid_passport_number);
@@ -78,12 +85,14 @@ void search_user_by_passport(Operator *op) {
 }
 
 void search_user_by_name(Operator *op) {
+  wcout << labels::search_user_by_name << endl;
   std::wstring pattern = input_line<std::wstring>(
       labels::search_user, labels::default_error, is_valid_string);
   op->find_users(pattern);
 }
 
 void add_sim(Operator *op) {
+  wcout << labels::add_sim << endl;
   wstring number =
       input(labels::add_sim_input_number, labels::add_sim_input_number_error,
             is_valid_sim_number);
@@ -102,6 +111,7 @@ void add_sim(Operator *op) {
 }
 
 void del_sim(Operator *op) {
+  wcout << labels::del_sim << endl;
   wstring number =
       input(labels::add_sim_input_number, labels::add_sim_input_number_error,
             is_valid_sim_number);
@@ -112,9 +122,13 @@ void del_sim(Operator *op) {
   }
 }
 
-void show_sims(Operator *op) { op->show_all_sim(); }
+void show_sims(Operator *op) {
+  wcout << labels::show_sims << endl;
+  op->show_all_sim();
+}
 
 void clear_sims(Operator *op) {
+  wcout << labels::clear_sims << endl;
   wstring yes_no =
       input(labels::are_you_sure, labels::are_you_sure_error, is_valid_yes_no);
   if (is_yes(yes_no))
@@ -122,6 +136,7 @@ void clear_sims(Operator *op) {
 }
 
 void search_sim_by_number(Operator *op) {
+  wcout << labels::search_sim_by_number << endl;
   wstring number =
       input(labels::add_sim_input_number, labels::add_sim_input_number_error,
             is_valid_sim_number);
@@ -129,12 +144,14 @@ void search_sim_by_number(Operator *op) {
 }
 
 void search_sim_by_tarif(Operator *op) {
+  wcout << labels::search_sim_by_tarif << endl;
   wstring tariff = input_line<wstring>(labels::add_sim_input_tariff,
                                        labels::default_error, is_valid_string);
   op->find_sims(tariff);
 }
 
 void reg_user_sim(Operator *op) {
+  wcout << labels::reg_user_sim << endl;
   wstring sim_number =
       input(labels::add_sim_input_number, labels::add_sim_input_number_error,
             is_valid_sim_number);
@@ -164,6 +181,7 @@ void reg_user_sim(Operator *op) {
 }
 
 void del_user_sim(Operator *op) {
+  wcout << labels::del_user_sim << endl;
   wstring sim_number =
       input(labels::add_sim_input_number, labels::add_sim_input_number_error,
             is_valid_sim_number);
@@ -185,6 +203,7 @@ void del_user_sim(Operator *op) {
 }
 
 void open_database(Operator *op) {
+  wcout << labels::open_database << endl;
   wstring filename = input(labels::filename_to_open, labels::open_file_error,
                            is_valid_filename);
   try {
@@ -195,6 +214,7 @@ void open_database(Operator *op) {
 }
 
 void save_database(Operator *op) {
+  wcout << labels::save_database << endl;
   wstring filename = input(labels::filename_to_save, labels::open_file_error,
                            is_valid_filename);
   try {
