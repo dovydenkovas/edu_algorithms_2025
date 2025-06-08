@@ -77,7 +77,8 @@ TEST(hashmap, inserterase) {
  * Создать случайный ключ
  */
 wstring generate_key() {
-    wchar_t key[10];
+    wchar_t key[11];
+    key[10] = L'\0';
     for (int i = 0; i < 10; ++i)
       key[i] = rand()%10 + '0';
     return wstring{key};
@@ -88,13 +89,16 @@ wstring generate_key() {
  * попаданий в каждую ячейку и записать в файл.
  */
 TEST(HASH, count) {
-    uint32_t hashmap_capacity = 1000;
+    uint32_t hashmap_capacity = 16;
     int *arr = new int[hashmap_capacity];
     for (int i=0; i<hashmap_capacity; ++i)
         arr[i] = 0;
     for  (int i=0; i<10*hashmap_capacity; i++) {
         auto key = generate_key();
         arr[wstring_hash(key)%hashmap_capacity]++;
+        if (wstring_hash(key)%hashmap_capacity == 8) {
+          std::wcout << key << std::endl;
+        }
     }
 
     std::ofstream ofile("hash1.csv");
