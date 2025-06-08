@@ -7,8 +7,6 @@
 #include <iostream>
 #include <string>
 
-
-
 TuiApplication::TuiApplication(Operator *op, UIForms *forms)
     : op{op}, forms{forms} {}
 
@@ -35,12 +33,14 @@ void add_user(Operator *op) {
       input(labels::add_user_input_year, labels::add_user_input_year_error,
             is_valid_birth_year);
   wstring address = input_line<wstring>(labels::add_user_input_address,
-                                        labels::add_user_input_address_error);
-  wstring passport_number = input(labels::input_passport_number,
-                                  labels::input_passport_number_error,
-                                  is_valid_passport_number);
-  wstring passport_date = input_line<wstring>(
-      labels::input_passport_date_of_issue, labels::default_error);
+                                        labels::add_user_input_address_error,
+                                        is_valid_string);
+  wstring passport_number =
+      input(labels::input_passport_number, labels::input_passport_number_error,
+            is_valid_passport_number);
+  wstring passport_date =
+      input_line<wstring>(labels::input_passport_date_of_issue,
+                          labels::default_error, is_valid_string);
 
   try {
     op->add_user(
@@ -51,9 +51,9 @@ void add_user(Operator *op) {
 }
 
 void del_user(Operator *op) {
-  wstring passport_number = input(labels::input_passport_number,
-                                  labels::input_passport_number_error,
-                                  is_valid_passport_number);
+  wstring passport_number =
+      input(labels::input_passport_number, labels::input_passport_number_error,
+            is_valid_passport_number);
   try {
     op->remove_user(passport_number);
   } catch (Error &e) {
@@ -71,15 +71,15 @@ void clear_users(Operator *op) {
 }
 
 void search_user_by_passport(Operator *op) {
-  std::wstring number  =
-      input_line(labels::input_passport_number, labels::input_passport_number_error, is_valid_passport_number);
+  std::wstring number =
+      input_line(labels::input_passport_number,
+                 labels::input_passport_number_error, is_valid_passport_number);
   op->find_user(number);
 }
 
-
 void search_user_by_name(Operator *op) {
-  std::wstring pattern =
-      input_line<std::wstring>(labels::search_user, labels::default_error);
+  std::wstring pattern = input_line<std::wstring>(
+      labels::search_user, labels::default_error, is_valid_string);
   op->find_users(pattern);
 }
 
@@ -87,8 +87,8 @@ void add_sim(Operator *op) {
   wstring number =
       input(labels::add_sim_input_number, labels::add_sim_input_number_error,
             is_valid_sim_number);
-  wstring tariff =
-      input_line<wstring>(labels::add_sim_input_tariff, labels::default_error);
+  wstring tariff = input_line<wstring>(labels::add_sim_input_tariff,
+                                       labels::default_error, is_valid_string);
   uint16_t issue_year =
       input(labels::add_sim_input_year, labels::add_sim_input_year_error,
             is_valid_issue_year);
@@ -129,8 +129,8 @@ void search_sim_by_number(Operator *op) {
 }
 
 void search_sim_by_tarif(Operator *op) {
-  wstring tariff =
-      input_line<wstring>(labels::add_sim_input_tariff, labels::default_error);
+  wstring tariff = input_line<wstring>(labels::add_sim_input_tariff,
+                                       labels::default_error, is_valid_string);
   op->find_sims(tariff);
 }
 
@@ -138,13 +138,16 @@ void reg_user_sim(Operator *op) {
   wstring sim_number =
       input(labels::add_sim_input_number, labels::add_sim_input_number_error,
             is_valid_sim_number);
-  wstring passport_number = input(labels::input_passport_number,
-                                  labels::input_passport_number_error,
-                                  is_valid_passport_number);
-  wstring reg_date = input<wstring>(labels::input_registration_date, labels::default_error);
-  wstring exp_date = input<wstring>(labels::input_expiration_date, labels::default_error);
+  wstring passport_number =
+      input(labels::input_passport_number, labels::input_passport_number_error,
+            is_valid_passport_number);
+  wstring reg_date = input<wstring>(labels::input_registration_date,
+                                    labels::default_error, is_valid_string);
+  wstring exp_date = input<wstring>(labels::input_expiration_date,
+                                    labels::default_error, is_valid_string);
   try {
-    op->registration_sim(SimRegistation{sim_number, passport_number, reg_date, exp_date});
+    op->registration_sim(
+        SimRegistation{sim_number, passport_number, reg_date, exp_date});
   } catch (Error &e) {
     switch (e) {
     case Error::UserNotExist:
@@ -181,9 +184,9 @@ void del_user_sim(Operator *op) {
   }
 }
 
-
 void open_database(Operator *op) {
-  wstring filename = input(labels::filename_to_open, labels::open_file_error, is_valid_filename);
+  wstring filename = input(labels::filename_to_open, labels::open_file_error,
+                           is_valid_filename);
   try {
     op->open(filename);
   } catch (exception &e) {
@@ -192,7 +195,8 @@ void open_database(Operator *op) {
 }
 
 void save_database(Operator *op) {
-  wstring filename = input(labels::filename_to_save, labels::open_file_error, is_valid_filename);
+  wstring filename = input(labels::filename_to_save, labels::open_file_error,
+                           is_valid_filename);
   try {
     op->save(filename);
   } catch (exception &e) {
@@ -201,7 +205,8 @@ void save_database(Operator *op) {
 }
 
 void exit_op(Operator *op) {
-  wstring need_save = input(labels::need_save, labels::enter_yes_or_no, is_valid_yes_no);
+  wstring need_save =
+      input(labels::need_save, labels::enter_yes_or_no, is_valid_yes_no);
   if (is_yes(need_save))
     save_database(op);
   exit(0);

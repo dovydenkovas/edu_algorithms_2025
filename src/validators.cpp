@@ -17,6 +17,16 @@ bool is_cyrillic(wchar_t ch) {
       || L'ё' == ch || ch == L'Ё';
 }
 
+bool is_valid_string(std::wstring str) {
+  if (str.size() > 200)
+    return false;
+
+  for (auto &ch : str)
+    if (ch == L';')
+      return false;
+  return true;
+}
+
 bool is_valid_name(std::wstring name) {
   if (name.size() > 50)
     return false;
@@ -77,7 +87,6 @@ bool is_valid_issue_year(uint16_t year) {
   return 2000 <= year && year <= current_year();
 }
 
-// Проверка имени файл. Открывает файл для чтения.
 bool is_valid_filename(std::wstring filename) {
   std::filesystem::path fname(filename);
   std::ifstream file{fname};

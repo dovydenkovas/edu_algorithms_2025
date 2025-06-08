@@ -223,13 +223,15 @@ void Operator::find_user(wstring passport_number) {
     // должно корректироваться значение поля «Признак наличия» для
     // соответствующей SIM-карты.
     //
-    // 2. Одному клиенту может быть выдано несколько SIM-карт. Таким образом,
+    // Одному клиенту может быть выдано несколько SIM-карт. Таким образом,
     // могут быть данные, имеющие повторяющиеся значения в своих полях.
 
     if (!users.contains(simreg.get_passport_number()))
       throw Error::UserNotExist;
     if (!sims.contains(simreg.get_sim_number()))
       throw Error::SimNotExist;
+    if (!sims[simreg.get_sim_number()].is_free())
+      throw "Карта уже выдана";
 
     auto &sim = sims[simreg.get_sim_number()];
     sim.free(false);
