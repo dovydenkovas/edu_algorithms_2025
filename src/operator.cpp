@@ -236,12 +236,22 @@ void Operator::find_user(wstring passport_number) {
     registrations.push_back(simreg);
   }
 
-  // регистрацию возврата SIM-карты от клиента.
-  void Operator::remove_registration_sim(wstring sim_number) {
-    // При регистрации выдачи SIM-карты клиенту или возврата SIM-карты клиентом
-    // должно корректироваться значение поля «Признак наличия» для
-    // соответствующей SIM-карты.
+// регистрацию возврата SIM-карты от клиента.
+void Operator::remove_registration_sim(wstring sim_number) {
+  // При регистрации возврата SIM-карты клиентом  должно корректироваться
+  // значение поля «Признак наличия» для соответствующей SIM-карты.
+  if (!sims.contains(sim_number))
+    return;
+
+  sims[sim_number].free(true);
+
+  for (auto reg = registrations.begin(); reg != registrations.end(); ++reg) {
+    if ((*reg).get_sim_number() == sim_number) {
+      registrations.erase(reg);
+      break;
+    }
   }
+}
 
 // Прочитать запись о пользователе из строки.
 User parse_user(const wstring line) {
