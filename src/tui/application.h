@@ -67,6 +67,7 @@ label main_menu_actions = LR"===(
   label input_registration_date = L"Введите дату выдачи карты.";
   label input_expiration_date = L"Введите дату окончания действия карты.";
 
+  label date_error = L"Дата должна быть введена в формате dd.mm.yyyy или dd/mm/yyyy и не быть меньше 01/01/2000.";
 } // namespace labels
 
 void pause();

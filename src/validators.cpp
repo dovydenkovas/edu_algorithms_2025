@@ -1,6 +1,7 @@
 #include "validators.h"
 #include <cctype>
 #include <filesystem>
+#include <sstream>
 #include <string>
 #include <ctime>
 
@@ -91,4 +92,18 @@ bool is_valid_filename(std::wstring filename) {
   std::filesystem::path fname(filename);
   std::ifstream file{fname};
   return (file.is_open() || !std::filesystem::exists(fname)) && !std::filesystem::is_directory(fname);
+}
+
+// Соответствует ли строка формату даты: dd.mm.yyyy или dd/mm/yyyy.
+bool is_valid_date(std::wstring date) {
+  if (date.size() > 10)
+    return false;
+  std::wstringstream sdate{date};
+  int d, m, y;
+  wchar_t sep1, sep2;
+  sdate >> d >> sep1 >> m >> sep2 >> y;
+  return d > 0 && d < 32
+      && m > 0 && m < 13
+      && y >= 2000
+      && sep1 == sep2 && (sep1 == L'.' || sep1 == L'/');
 }

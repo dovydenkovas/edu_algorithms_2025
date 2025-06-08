@@ -142,9 +142,9 @@ void reg_user_sim(Operator *op) {
       input(labels::input_passport_number, labels::input_passport_number_error,
             is_valid_passport_number);
   wstring reg_date = input<wstring>(labels::input_registration_date,
-                                    labels::default_error, is_valid_string);
+                                    labels::date_error, is_valid_date);
   wstring exp_date = input<wstring>(labels::input_expiration_date,
-                                    labels::default_error, is_valid_string);
+                                    labels::date_error, is_valid_date);
   try {
     op->registration_sim(
         SimRegistation{sim_number, passport_number, reg_date, exp_date});

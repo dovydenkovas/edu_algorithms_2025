@@ -40,3 +40,6 @@ bool is_valid_issue_year(uint16_t year);
 
 // Проверка имени файл. Открывает файл для чтения.
 bool is_valid_filename(std::wstring filename);
+
+// Соответствует ли строка формату даты: dd.mm.yyyy или dd/mm/yyyy.
+bool is_valid_date(std::wstring date);
