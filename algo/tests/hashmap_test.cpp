@@ -1,8 +1,10 @@
 #include <algo/hash.h>
 #include <algo/hashmap.hpp>
+#include <cstdint>
 #include <gtest/gtest.h>
 #include <iostream>
 #include <string>
+#include <fstream>
 
 using algo::hashmap;
 using algo::wstring_hash;
@@ -69,4 +71,35 @@ TEST(hashmap, inserterase) {
   ASSERT_EQ(0, a.size());
   ASSERT_FALSE(a.contains(w));
   ASSERT_TRUE(a.empty());
+}
+
+/**
+ * Создать случайный ключ
+ */
+wstring generate_key() {
+    wchar_t key[10];
+    for (int i = 0; i < 10; ++i)
+      key[i] = rand()%10 + '0';
+    return wstring{key};
+}
+
+/**
+ * Создать очень много случайных ключей, посчитать количество
+ * попаданий в каждую ячейку и записать в файл.
+ */
+TEST(HASH, count) {
+    uint32_t hashmap_capacity = 1000;
+    int *arr = new int[hashmap_capacity];
+    for (int i=0; i<hashmap_capacity; ++i)
+        arr[i] = 0;
+    for  (int i=0; i<10*hashmap_capacity; i++) {
+        auto key = generate_key();
+        arr[wstring_hash(key)%hashmap_capacity]++;
+    }
+
+    std::ofstream ofile("hash1.csv");
+    for  (int i=0; i<hashmap_capacity; i++)
+        ofile << i << "; " << arr[i] << std::endl;
+
+    delete[] arr;
 }
