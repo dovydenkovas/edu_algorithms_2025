@@ -78,6 +78,18 @@ void Operator::find_user(wstring passport_number) {
     forms->add_value(L"Год рождения", year.str());
     forms->add_value(L"Адрес", user.get_address());
     forms->add_value(L"Дата и место выдачи паспорта", user.get_passport_date_of_issue());
+
+    int n_sims = 0;
+    for (auto reg: registrations) {
+      if (reg.get_passport_number() == passport_number) {
+        ++n_sims;
+        wostringstream os;
+        os << L"SIM-карта " << n_sims;
+        forms->add_value(os.str(), reg.get_sim_number());
+      }
+    }
+
+
     forms->render();
   }
 }
@@ -240,6 +252,7 @@ void Operator::find_user(wstring passport_number) {
     auto &sim = sims[simreg.get_sim_number()];
     sim.free(false);
     registrations.push_back(simreg);
+    registrations.sort();
   }
 
 // регистрацию возврата SIM-карты от клиента.

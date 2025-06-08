@@ -188,7 +188,7 @@ template <class T> void list<T>::sort() {
   // Восстановить указатель на последний элемент и
   // цикличность списка
   Node *node = first;
-  for (int i = 0; i < lst_size - 1; ++i)
+  for (size_t i = 0; i < lst_size - 1; ++i)
     node = node->next;
 
   node->next = first;
@@ -218,7 +218,7 @@ typename list<T>::Node *list<T>::merge_sort(typename list<T>::Node *before_left,
   }
 
   Node *ptrr = left;
-  for (int i = 0; i < size; ++i)
+  for (size_t i = 0; i < size; ++i)
     ptrr = ptrr->next;
 
   // Сортируем первую половину до середины (округление вверх)

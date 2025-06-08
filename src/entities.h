@@ -57,4 +57,6 @@ public:
   wstring get_passport_number() const { return passport_number; }
   wstring get_registration_date() const { return registration_date; }
   wstring get_expiration_date() const { return expiration_date; }
+  bool operator<=(const SimRegistation &rht) const {return sim_number <= passport_number;}
+  bool operator>(const SimRegistation &rht) const {return sim_number > passport_number;}
 };

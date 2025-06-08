@@ -1,0 +1,4 @@
+#!gnuplot --persist
+
+set style fill solid
+plot 'hash1.csv' with boxes lt rgb "#4688f5";
