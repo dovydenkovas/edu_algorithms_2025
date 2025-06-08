@@ -5,13 +5,6 @@
 
 using namespace std;
 
-enum class Error {
-  UserExist,
-  UserNotExist,
-  SimExist,
-  SimNotExist,
-};
-
 class User {
   wstring passport_number;
   wstring name;

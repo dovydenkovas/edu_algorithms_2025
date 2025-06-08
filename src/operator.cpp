@@ -11,11 +11,12 @@
 #include "validators.h"
 #include <locale.h>
 #include <codecvt>
+#include "exceptions.h"
 
 // Регистрация нового клиента.
 void Operator::add_user(User user) {
   if (users.contains(user.get_passport_number()))
-    throw Error::UserExist;
+    throw UserExist();
   users.insert(user.get_passport_number(), user);
 }
 
@@ -25,7 +26,7 @@ void Operator::remove_user(std::wstring passport) {
   // ситуации, когда эта SIM-карта уже выдана клиенту.
 
   if (!users.contains(passport))
-    throw Error::UserNotExist;
+    throw UserNotExist();
 
   // Удалить все карты клиента
   for (auto reg = registrations.begin(); reg != registrations.end();)
@@ -40,7 +41,7 @@ void Operator::remove_user(std::wstring passport) {
 void Operator::show_all_users() {
   table->clear();
   algo::vector<wstring> title{L"Номер паспорта", L"Имя клиента",
-                              L"Год рождения", L"Адрес", L"Дата выдачи паспорта"};
+                              L"Год рождения", L"Адрес", L"Дата и место выдачи паспорта"};
   table->set_title(title);
 
   for (auto &a : users) {
@@ -76,7 +77,7 @@ void Operator::find_user(wstring passport_number) {
     forms->add_value(L"Номер паспорта", passport_number);
     forms->add_value(L"Год рождения", year.str());
     forms->add_value(L"Адрес", user.get_address());
-    forms->add_value(L"Дата выдачи паспорта", user.get_passport_date_of_issue());
+    forms->add_value(L"Дата и место выдачи паспорта", user.get_passport_date_of_issue());
     forms->render();
   }
 }
@@ -115,21 +116,24 @@ void Operator::find_user(wstring passport_number) {
   // Добавление новой SIM-карты
   void Operator::add_sim(Sim sim) {
     if (sims.contains(sim.get_number()))
-      throw Error::SimExist;
+      throw SimExist();
     sims.insert(sim.get_number(), sim);
   }
 
   // Удаление сведений о SIM-карте
   void Operator::remove_sim(wstring number) {
     if (!sims.contains(number))
-      return;
+      throw SimNotExist();
+
     // При удалении сведений о SIM-карте должны быть учтены и обработаны
     // ситуации, когда эта SIM-карта уже выдана клиенту.
-    for (auto it = registrations.begin(); it != registrations.end(); ++it) {
-       if ((*it).get_sim_number() == number) {
-        registrations.erase(it);
-        break;
-       }
+    if (!sims[number].is_free()) {
+      for (auto it = registrations.begin(); it != registrations.end(); ++it) {
+        if ((*it).get_sim_number() == number) {
+          registrations.erase(it);
+          break;
+        }
+      }
     }
 
     sims.erase(number);
@@ -227,11 +231,11 @@ void Operator::find_user(wstring passport_number) {
     // могут быть данные, имеющие повторяющиеся значения в своих полях.
 
     if (!users.contains(simreg.get_passport_number()))
-      throw Error::UserNotExist;
+      throw UserNotExist();
     if (!sims.contains(simreg.get_sim_number()))
-      throw Error::SimNotExist;
+      throw SimNotExist();
     if (!sims[simreg.get_sim_number()].is_free())
-      throw "Карта уже выдана";
+      throw SimRegistationExist();
 
     auto &sim = sims[simreg.get_sim_number()];
     sim.free(false);
@@ -243,10 +247,12 @@ void Operator::remove_registration_sim(wstring sim_number) {
   // При регистрации возврата SIM-карты клиентом  должно корректироваться
   // значение поля «Признак наличия» для соответствующей SIM-карты.
   if (!sims.contains(sim_number))
-    return;
+    throw SimNotExist();
+
+  if (sims[sim_number].is_free())
+    throw SimRegistationNotExist();
 
   sims[sim_number].free(true);
-
   for (auto reg = registrations.begin(); reg != registrations.end(); ++reg) {
     if ((*reg).get_sim_number() == sim_number) {
       registrations.erase(reg);
@@ -279,7 +285,7 @@ User parse_user(const wstring line) {
 
   if (is_valid_passport_number(passport_number) && is_valid_name(name) && is_valid_birth_year(birth_year))
     return User{name, birth_year, address, passport_number, passport_date_of_issue};
-  throw runtime_error("User.");
+  throw ParseUser();
 }
 
 // Прочитать запись о SIM-карте из строки.
@@ -299,7 +305,7 @@ Sim parse_sim(const wstring line) {
 
   if (is_valid_sim_number(number) && is_valid_issue_year(issue_year))
     return Sim{number, tariff, issue_year, true};
-  throw runtime_error("Sim.");
+  throw ParseSim();
 }
 
 // Прочитать запись о регистрации из строки.
@@ -319,7 +325,7 @@ SimRegistation parse_registration(const wstring line) {
 
   if (is_valid_sim_number(sim_number) && is_valid_passport_number(passport_number))
       return SimRegistation{sim_number, passport_number, registration_date, expiration_date};
-    throw runtime_error("Reg.");
+    throw ParseReg();
 }
 
 // Открыть файл базы данных.
@@ -346,7 +352,7 @@ void Operator::open(const wstring filename) {
       if (state == USERS) add_user(parse_user(line));
       else if (state == SIMS) add_sim(parse_sim(line));
       else if (state == REGISTRATIONS) registration_sim(parse_registration(line));
-      else throw std::runtime_error("None section.");
+      else throw ParseError();
     }
   getline(ifile, line);
   }

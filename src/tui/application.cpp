@@ -6,6 +6,7 @@
 #include <exception>
 #include <iostream>
 #include <string>
+#include "../exceptions.h"
 
 TuiApplication::TuiApplication(Operator *op, UIForms *forms)
     : op{op}, forms{forms} {}
@@ -46,8 +47,8 @@ void add_user(Operator *op) {
   try {
     op->add_user(
         User(name, birth_year, address, passport_number, passport_date));
-  } catch (Error &e) {
-    wcout << labels::user_exist << endl;
+  } catch (InfoException &e) {
+    wcout << e.what() << endl;
   }
 }
 
@@ -58,8 +59,8 @@ void del_user(Operator *op) {
             is_valid_passport_number);
   try {
     op->remove_user(passport_number);
-  } catch (Error &e) {
-    wcout << labels::user_not_exist << endl;
+  } catch (InfoException &e) {
+    wcout << e.what() << endl;
   }
 }
 
@@ -105,8 +106,8 @@ void add_sim(Operator *op) {
 
   try {
     op->add_sim(Sim(number, tariff, issue_year, is_free));
-  } catch (Error &e) {
-    wcout << labels::sim_exist << endl;
+  } catch (InfoException &e) {
+    wcout << e.what() << endl;
   }
 }
 
@@ -117,8 +118,8 @@ void del_sim(Operator *op) {
             is_valid_sim_number);
   try {
     op->remove_sim(number);
-  } catch (Error &e) {
-    wcout << labels::sim_not_exist << endl;
+  } catch (InfoException &e) {
+    wcout << e.what() << endl;
   }
 }
 
@@ -165,18 +166,8 @@ void reg_user_sim(Operator *op) {
   try {
     op->registration_sim(
         SimRegistation{sim_number, passport_number, reg_date, exp_date});
-  } catch (Error &e) {
-    switch (e) {
-    case Error::UserNotExist:
-      wcout << labels::user_not_exist << endl;
-      break;
-    case Error::SimNotExist:
-      wcout << labels::sim_not_exist << endl;
-      break;
-    case Error::UserExist:
-    case Error::SimExist:
-      break;
-    }
+  } catch (InfoException &e) {
+    wcout << e.what() << endl;
   }
 }
 
@@ -187,18 +178,8 @@ void del_user_sim(Operator *op) {
             is_valid_sim_number);
   try {
     op->remove_registration_sim(sim_number);
-  } catch (Error &e) {
-    switch (e) {
-    case Error::UserNotExist:
-      wcout << labels::user_not_exist << endl;
-      break;
-    case Error::SimNotExist:
-      wcout << labels::sim_not_exist << endl;
-      break;
-    case Error::UserExist:
-    case Error::SimExist:
-      break;
-    }
+  } catch (InfoException &e) {
+    wcout << e.what() << endl;
   }
 }
 
@@ -208,7 +189,7 @@ void open_database(Operator *op) {
                            is_valid_filename);
   try {
     op->open(filename);
-  } catch (exception &e) {
+  } catch (InfoException &e) {
     std::wcout << labels::open_file_error << L": " << e.what() << std::endl;
   }
 }

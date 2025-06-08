@@ -58,7 +58,7 @@ label main_menu_actions = LR"===(
   label add_user_input_address_error = L"Адрес может быть произвольной строкой.";
   label input_passport_number = L"Введите номер паспорта клиента.";
   label input_passport_number_error = L"Номер паспорта – строка формата «NNNN-NNNNNN», где N – цифры.";
-  label input_passport_date_of_issue = L"Введите дату выдачи паспорта.";
+  label input_passport_date_of_issue = L"Введите дату и место выдачи паспорта.";
   label user_exist = L"Пользователь с указанным паспортом уже существует.";
   label user_not_exist = L"Пользователя с указанным паспортом не существует.";
   label are_you_sure = L"Вы уверены? (да/нет)";
