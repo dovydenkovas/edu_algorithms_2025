@@ -11,6 +11,7 @@
 #include "validators.h"
 #include <locale.h>
 #include <codecvt>
+#include <utility>
 #include "exceptions.h"
 
 // Регистрация нового клиента.
@@ -24,17 +25,21 @@ void Operator::add_user(User user) {
 void Operator::remove_user(std::wstring passport) {
   // При удалении сведений о клиенте должны быть учтены и обработаны
   // ситуации, когда эта SIM-карта уже выдана клиенту.
-
   if (!users.contains(passport))
     throw UserNotExist();
 
   // Удалить все карты клиента
-  for (auto reg = registrations.begin(); reg != registrations.end();)
+  int i = 0;
+  int size = registrations.size();
+  for (auto reg = registrations.begin(); i < size; ++i)
     if ((*reg).get_passport_number() == passport) {
       sims[(*reg).get_sim_number()].free(true); // Симка не выдана.
-      registrations.erase(reg); // Удалить запись о выдаче.
+      auto buff = reg;
+      ++reg;
+      registrations.erase(buff); // Удалить запись о выдаче.
     } else
       ++reg;
+  users.erase(passport);
 }
 
 // Просмотр всех зарегистрированных клиентов.
@@ -44,8 +49,9 @@ void Operator::show_all_users() {
                               L"Год рождения", L"Адрес", L"Дата и место выдачи паспорта"};
   table->set_title(title);
 
-  for (auto &a : users) {
-    User user = a.second;
+  auto vec_users = users.forward();
+  for (auto a : vec_users) {
+    User user = a;
     wstring passport = user.get_passport_number();
     wstring name = user.get_name();
     wstringstream year;
@@ -110,7 +116,8 @@ void Operator::find_user(wstring passport_number) {
     algo::vector<wstring> title{L"Номер паспорта", L"Имя клиента",
                                   L"Год рождения", L"Адрес"};
     table->set_title(title);
-    for (auto &[id, user]: users) {
+    auto vec_users = users.forward();
+    for (auto user: vec_users) {
     if (algo::search(user.get_name(), pattern) || algo::search(user.get_address(), pattern)) {
         wstring passport = user.get_passport_number();
         wstring name = user.get_name();
@@ -376,8 +383,9 @@ void Operator::save(wstring filename) {
  wofstream ofile{std::filesystem::path{filename}};
  ofile.imbue(std::locale(locale(), new std::codecvt_utf8<wchar_t>));
  ofile << "[users]" << endl;
- for (auto [id, user]: users) {
-   ofile << id << L';' << user.get_name()  << L';'
+ auto vec_users = users.forward();
+ for (auto user: vec_users) {
+   ofile << user.get_passport_number() << L';' << user.get_name()  << L';'
    << user.get_birth_year() << L';' << user.get_address() << L';'
    << user.get_passport_date_of_issue() << endl;
  }

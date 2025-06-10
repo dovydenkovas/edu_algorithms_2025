@@ -4,6 +4,7 @@
 #include <algo/vector.hpp>
 #include <math.h>
 #include <stdexcept>
+#include <vector>
 
 namespace algo {
 template <class K, class V> class map {
@@ -24,13 +25,9 @@ public:
   void insert(K key, V value);
   void erase(K key);
 
-  class iterator;
-  iterator begin();
-  iterator end();
-
   ~map();
 
-  algo::vector<V> forward();
+  std::vector<V> forward();
   int height();
 
 private:
@@ -52,89 +49,11 @@ private:
   Node *next_node(Node *prev);
   Node *get(K key) const;
   size_t tree_size;
-  void rec_forward(Node *node, algo::vector<V> &res);
+  void rec_forward(Node *node, std::vector<V> &res);
   int rec_height(Node *node);
   void move(Node* node, Node* position);
   Node *minimum(Node *node);
-};
-
-template <class K, class V> class map<K, V>::iterator {
-private:
-  Node *node;
-  bool is_end;
-
-public:
-  explicit iterator(Node *n, bool is_end_) : node(n), is_end(is_end_) {}
-
-  // Прямой обход
-  iterator &operator++() {
-    if (is_end)
-      return *this;
-    // Пример обхода следующий:
-    //       D         |
-    //     /   \       |
-    //    B     F      |
-    //   / \   / \     |
-    //  A   C E   G    |
-    // Если есть левая ветвь - следующий элемент корень левой ветви.
-    // Например, D->B, F->E
-    if (node->left) {
-      node = node->left;
-      return *this;
-    }
-    // Если есть правая ветвь - следующий элемент корень правой ветви.
-    // Например, D->F, F->G
-    if (node->right) {
-      node = node->right;
-      return *this;
-    }
-    // Вверх пока поднимаемся из правого поддерева.
-    Node *old = node;
-    node = node->parent;
-    while (node && node->right == old) {
-      old = node;
-      node = node->parent;
-    }
-
-    // Если поднялись до корня - конец обхода.
-    if (node == nullptr) {
-      node = old;
-      is_end = true;
-      return *this;
-    }
-
-    // Если предшественник был в левой ветви, следующий элемент - родитель правой ветви,
-    if (node->right) {
-      node = node->right;
-      return *this;
-    }
-    Node* next = node->parent;
-    bool from_right = false;
-    while (next && (!node->right || next->right == node)) {
-      from_right = next->right == node;
-      next = next->parent;
-      node = node->parent;
-    }
-
-    if (node->right && !from_right)
-      node = node->right;
-    else
-      is_end = true;
-    return *this;
-  }
-
-  iterator operator++(int) {
-    iterator retval = *this;
-    ++(*this);
-    return retval;
-  }
-
-  bool operator==(iterator other) const {
-    return (!is_end && !other.is_end && node == other.node)
-          ||(is_end && other.is_end);
-  }
-  bool operator!=(iterator other) const { return !(*this == other); }
-  std::pair<const K, V> &operator*() const { return this->node->data; }
+  Node *rotate(Node *node);
 };
 
 template <class K, class V> map<K, V>::map() : root{nullptr}, tree_size{0} {}
@@ -269,7 +188,6 @@ template <class K, class V> void map<K, V>::insert(K key, V value) {
 // Удаляет пару ключ-значение из дерева.
 // Если ключа нет - вызывает исключение.
 template <class K, class V> void map<K, V>::erase(K key) {
-  // std::cout << "delete " << key << std::endl;
   Node *node = get(key);
   if (!node)
     throw std::runtime_error("Key not found");
@@ -318,25 +236,13 @@ template <class K, class V> void map<K, V>::erase(K key) {
 
     delete node;
     --tree_size;
-    std::cout << height() << " " << log2(double(size())) << "\n";
 }
 
-// Выбор минимального элемента.
-template <class K, class V> typename map<K, V>::iterator map<K, V>::begin() {
-  if (!root)
-    return end();
-
-  return iterator{root, false};
-}
-
-template <class K, class V> typename map<K, V>::iterator map<K, V>::end() {
-  return iterator{nullptr, true};
-}
 
 // Удалить все узлы дерева.
 template <class K, class V> void map<K, V>::clear() {
-  while (begin() != end())
-    erase((*begin()).first);
+  while (root)
+    erase(root->data.first);
 }
 
 template <class K, class V> map<K, V>::~map() {
@@ -344,7 +250,6 @@ template <class K, class V> map<K, V>::~map() {
 }
 
 template <class K, class V> typename map<K, V>::Node* map<K, V>::right_rotate(Node *b) {
-  // std::cout << "Right rot\n";
   // Перемещаем правого потомка на место родителя
   Node *a = b->right;
   move(a, b);
@@ -362,7 +267,6 @@ template <class K, class V> typename map<K, V>::Node* map<K, V>::right_rotate(No
 }
 
 template <class K, class V> typename map<K, V>::Node* map<K, V>::left_rotate(Node *b) {
-  // std::cout << "Left rot\n";
   // Перемещаем левого потомка на место родителя
   Node *a = b->left;
   move(a, b);
@@ -389,6 +293,61 @@ template <class K, class V> typename map<K, V>::Node* map<K, V>::big_left_rotate
   return left_rotate(node);
 }
 
+template <class K, class V> typename map<K, V>::Node *map<K, V>::rotate(Node *node) {
+  if (node->bf == -2 && node->right->bf == -1) {
+    node->bf = 0;
+    node->right->bf = 0;
+    node = right_rotate(node);
+  } else if (node->bf == -2 && node->right->bf == 0) {
+    node->bf = -1;
+    node->right->bf = 1;
+    node = right_rotate(node);
+
+  } else if (node->bf == 2 && node->left->bf == 1) {
+    node->bf = 0;
+    node->left->bf = 0;
+    node = left_rotate(node) ;
+  } else if (node->bf == 2 && node->left->bf == 0) {
+    node->bf = 1;
+    node->left->bf = -1;
+    node = left_rotate(node);
+
+  } else if (node->bf == -2 && node->right->bf == 1 && node->right->left->bf == 1) {
+    node->bf = 0;
+    node->right->bf = -1;
+    node->right->left->bf = 0;
+    node = big_right_rotate(node);
+  } else if (node->bf == -2 && node->right->bf == 1 && node->right->left->bf == -1) {
+    node->bf = 1;
+    node->right->bf = 0;
+    node->right->left->bf = 0;
+    node = big_right_rotate(node);
+  } else if (node->bf == -2 && node->right->bf == 1 && node->right->left->bf == 0) {
+    node->bf = 0;
+    node->right->bf = 0;
+    node->right->left->bf = 0;
+    node = big_right_rotate(node);
+
+  } else if (node->bf == 2 && node->left->bf == -1 && node->left->right->bf == -1) {
+    node->bf = 0;
+    node->left->bf = 1;
+    node->left->right->bf = 0;
+    node = big_left_rotate(node);
+  } else if (node->bf == 2 && node->left->bf == -1 && node->left->right->bf == 1) {
+    node->bf = -1;
+    node->left->bf = 0;
+    node->left->right->bf = 0;
+    node = big_left_rotate(node);
+  } else if (node->bf == 2 && node->left->bf == -1 && node->left->right->bf == 1) {
+    node->bf = 0;
+    node->left->bf = 0;
+    node->left->right->bf = 0;
+    node = big_left_rotate(node);
+  }
+ return node;
+}
+
+
 template <class K, class V> void map<K, V>::balance(Node *node) {
   if (!node)
     std::cerr << "NULL balanced node";
@@ -406,58 +365,8 @@ template <class K, class V> void map<K, V>::balance(Node *node) {
 
     // Если баланс-фактор +-1 - продолжаем подъем
     // Если баланс-фактор +-2 - выполняем поворот
-    if (abs(node->bf) != 1) {
-      if (node->bf == -2 && node->right->bf == -1) {
-        node->bf = 0;
-        node->right->bf = 0;
-        node = right_rotate(node);
-      } else if (node->bf == -2 && node->right->bf == 0) {
-        node->bf = -1;
-        node->right->bf = 1;
-        node = right_rotate(node);
-
-      } else if (node->bf == 2 && node->left->bf == 1) {
-        node->bf = 0;
-        node->left->bf = 0;
-        node = left_rotate(node) ;
-      } else if (node->bf == 2 && node->left->bf == 0) {
-        node->bf = 1;
-        node->left->bf = -1;
-        node = left_rotate(node);
-
-      } else if (node->bf == -2 && node->right->bf == 1 && node->right->left->bf == 1) {
-        node->bf = 0;
-        node->right->bf = -1;
-        node->right->left->bf = 0;
-        node = big_right_rotate(node);
-      } else if (node->bf == -2 && node->right->bf == 1 && node->right->left->bf == -1) {
-        node->bf = 1;
-        node->right->bf = 0;
-        node->right->left->bf = 0;
-        node = big_right_rotate(node);
-      } else if (node->bf == -2 && node->right->bf == 1 && node->right->left->bf == 0) {
-        node->bf = 0;
-        node->right->bf = 0;
-        node->right->left->bf = 0;
-        node = big_right_rotate(node);
-
-      } else if (node->bf == 2 && node->left->bf == -1 && node->left->right->bf == -1) {
-        node->bf = 0;
-        node->left->bf = 1;
-        node->left->right->bf = 0;
-        node = big_left_rotate(node);
-      } else if (node->bf == 2 && node->left->bf == -1 && node->left->right->bf == 1) {
-        node->bf = -1;
-        node->left->bf = 0;
-        node->left->right->bf = 0;
-        node = big_left_rotate(node);
-      } else if (node->bf == 2 && node->left->bf == -1 && node->left->right->bf == 1) {
-        node->bf = 0;
-        node->left->bf = 0;
-        node->left->right->bf = 0;
-        node = big_left_rotate(node);
-      }
-    }
+    if (abs(node->bf) != 1)
+     node = rotate(node);
 
     if (node->bf == 0) // Если вершина сбалансирована останавливаем подъем
       return;
@@ -473,87 +382,36 @@ template <class K, class V> void map<K, V>::balance_after_remove(Node *node) {
 
   Node *prev = node;
   while (node) { // Поднимаемся до корня
-    // std::cout << "bal: " << node->data.first << " " << node->bf << std::endl;
     if (node->bf == 0) // Если вершина сбалансирована останавливаем подъем
       return;
 
     // Если баланс-фактор +-1 - продолжаем подъем
     // Если баланс-фактор +-2 - выполняем поворот
-    if (abs(node->bf) != 1) {
-      if (node->bf == -2 && node->right->bf == -1) {
-        node->bf = 0;
-        node->right->bf = 0;
-        node = right_rotate(node);
-      } else if (node->bf == -2 && node->right->bf == 0) {
-        node->bf = -1;
-        node->right->bf = 1;
-        node = right_rotate(node);
-
-      } else if (node->bf == 2 && node->left->bf == 1) {
-        node->bf = 0;
-        node->left->bf = 0;
-        node = left_rotate(node) ;
-      } else if (node->bf == 2 && node->left->bf == 0) {
-        node->bf = 1;
-        node->left->bf = -1;
-        node = left_rotate(node);
-
-      } else if (node->bf == -2 && node->right->bf == 1 && node->right->left->bf == 1) {
-        node->bf = 0;
-        node->right->bf = -1;
-        node->right->left->bf = 0;
-        node = big_right_rotate(node);
-      } else if (node->bf == -2 && node->right->bf == 1 && node->right->left->bf == -1) {
-        node->bf = 1;
-        node->right->bf = 0;
-        node->right->left->bf = 0;
-        node = big_right_rotate(node);
-      } else if (node->bf == -2 && node->right->bf == 1 && node->right->left->bf == 0) {
-        node->bf = 0;
-        node->right->bf = 0;
-        node->right->left->bf = 0;
-        node = big_right_rotate(node);
-
-      } else if (node->bf == 2 && node->left->bf == -1 && node->left->right->bf == -1) {
-        node->bf = 0;
-        node->left->bf = 1;
-        node->left->right->bf = 0;
-        node = big_left_rotate(node);
-      } else if (node->bf == 2 && node->left->bf == -1 && node->left->right->bf == 1) {
-        node->bf = -1;
-        node->left->bf = 0;
-        node->left->right->bf = 0;
-        node = big_left_rotate(node);
-      } else if (node->bf == 2 && node->left->bf == -1 && node->left->right->bf == 1) {
-        node->bf = 0;
-        node->left->bf = 0;
-        node->left->right->bf = 0;
-        node = big_left_rotate(node);
-      }
-    }
+    if (abs(node->bf) != 1)
+      node = rotate(node);
 
     if (!node || node->bf == 0) // Если вершина сбалансирована останавливаем подъем
       return;
+
+    if (node->left == prev)
+      --node->bf;
+    else
+      ++node->bf;
 
     prev = node;
     if (!node->parent)
          return;
     node = node->parent;
-    // if (node->left == prev)
-    //   --node->bf;
-    // else
-    //   ++node->bf;
-
-     }
+  }
 }
 
-template <class K, class V> algo::vector<V> map<K, V>::forward() {
-  algo::vector<V> vec;
+template <class K, class V> std::vector<V> map<K, V>::forward() {
+  std::vector<V> vec;
   rec_forward(root, vec);
   return vec;
 }
 
-template <class K, class V> void map<K, V>::rec_forward(Node *node, algo::vector<V> &res) {
+template <class K, class V> void map<K, V>::rec_forward(Node *node, std::vector<V> &res) {
   if (!node)
     return;
   res.push_back(node->data.second);

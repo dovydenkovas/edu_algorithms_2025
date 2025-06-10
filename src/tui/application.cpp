@@ -191,13 +191,14 @@ void open_database(Operator *op) {
     op->open(filename);
   } catch (InfoException &e) {
     std::wcout << labels::open_file_error << L": " << e.what() << std::endl;
+  } catch (...) {
+    std::wcout << labels::open_file_error << std::endl;
   }
 }
 
 void save_database(Operator *op) {
   wcout << labels::save_database << endl;
-  wstring filename = input(labels::filename_to_save, labels::open_file_error,
-                           is_valid_filename);
+  wstring filename = input<wstring>(labels::filename_to_save, labels::open_file_error);
   try {
     op->save(filename);
   } catch (exception &e) {

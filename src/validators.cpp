@@ -1,5 +1,6 @@
 #include "validators.h"
 #include <cctype>
+#include <exception>
 #include <filesystem>
 #include <sstream>
 #include <string>
@@ -14,8 +15,8 @@ uint16_t current_year() {
 
 bool is_cyrillic(wchar_t ch) {
   return (L'а' <= ch && ch <= L'я')
-      || L'А' <= ch || ch <= L'Я'
-      || L'ё' == ch || ch == L'Ё';
+      || (L'А' <= ch && ch <= L'Я')
+      || (L'ё' == ch && ch == L'Ё');
 }
 
 bool is_valid_string(std::wstring str) {
@@ -89,9 +90,15 @@ bool is_valid_issue_year(uint16_t year) {
 }
 
 bool is_valid_filename(std::wstring filename) {
-  std::filesystem::path fname(filename);
-  std::ifstream file{fname};
-  return (file.is_open() || !std::filesystem::exists(fname)) && !std::filesystem::is_directory(fname);
+  try {
+    std::filesystem::path fname(filename);
+    if (!std::filesystem::exists(fname) || std::filesystem::is_directory(fname))
+      return false;
+    std::ifstream file{fname};
+    return file.is_open();
+  } catch (...) {
+    return false;
+  }
 }
 
 // Соответствует ли строка формату даты: dd.mm.yyyy или dd/mm/yyyy.

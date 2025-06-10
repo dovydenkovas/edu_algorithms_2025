@@ -41,10 +41,8 @@ TEST(map, iterator) {
 
   auto vec = a.forward();
   for (auto i : vec) {
-    std::cout << i << std::endl;
     ASSERT_TRUE(i >= 'a' && i <= 'z');
   }
-  std::cout << "del\n";
 }
 
 TEST(map, bigtable) {
@@ -59,7 +57,6 @@ TEST(map, bigtable) {
   auto vec = a.forward();
   for (auto ch: vec)
     ++i;
-  std::cout << a.height() << std::endl;
   ASSERT_EQ(676, i);
   ASSERT_EQ(676, a.size());
 }
@@ -100,5 +97,4 @@ TEST(map, inserterase) {
       ASSERT_EQ(25-(i-'a'), a.size());
       ASSERT_FALSE(a.contains(ch));
     }
-    std::cout << "Delete!!!!\n";
 }
