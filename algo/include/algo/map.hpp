@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <iostream>
 #include <algo/vector.hpp>
+#include <math.h>
 #include <stdexcept>
 
 namespace algo {
@@ -54,6 +55,7 @@ private:
   void rec_forward(Node *node, algo::vector<V> &res);
   int rec_height(Node *node);
   void move(Node* node, Node* position);
+  Node *minimum(Node *node);
 };
 
 template <class K, class V> class map<K, V>::iterator {
@@ -274,75 +276,49 @@ template <class K, class V> void map<K, V>::erase(K key) {
 
   if (!node->left) {
     // Если нет левого поддерева, ставим на место удаляемого элемента правое поддерево
-    if (node->parent && node->parent->left == node) {
-      node->parent->left = node->right;
-      --node->parent->bf;
-    } else if (node->parent) {
-      node->parent->right = node->right;
-      ++node->parent->bf;
-    } if (node->right)
-      node->right->parent = node->parent;
-    if (node == root)
-      root = node->right;
+    if (node->parent) {
+      if (node->parent->left == node)
+        --node->parent->bf;
+      else
+        ++node->parent->bf;
+    }
+    move(node->right, node);
     balance_after_remove(node->parent);
 
   } else if (!node->right) {
     // Если нет правого поддерева, ставим на место удаляемого левое поддерево
-    if (node->parent && node->parent->left == node) {
-      node->parent->left = node->left;
-      --node->parent->bf;
-    } else if (node->parent) {
-      node->parent->right = node->left;
-      ++node->parent->bf;
-    } if (node->left)
-      node->left->parent = node->parent;
-    if (node == root)
-      root = node->left;
+    if (node->parent) {
+      if (node->parent->left == node)
+        --node->parent->bf;
+      else
+        ++node->parent->bf;
+    }
+    move(node->left, node);
     balance_after_remove(node->parent);
 
   } else {
     // Есть оба поддерева?
     // Взять следующий по величине элемент
-    Node *next = next_node(node);
-    // Если следующий элемент корень
-    Node *balanced_node = next->parent;
-    if (!next->parent) {
-      root = next->left;
-      if (next->right)
-        next->right->parent = nullptr;
-    }
-    else if (next->parent->left == next) {
-      next->parent->left = next->left;
-      --balanced_node->bf;
-      if (next->left)
-        next->left->parent = next->parent;
+    Node *next = minimum(node->right);
+    Node *balanced = next;
+    if (next->parent != node) {
+      balanced = next->parent;
+      --balanced->bf;
+      move(next->right, next);
+      next->right = node->right;
+      next->right->parent = next;
     } else {
-      next->parent->right = next->right;
-      ++balanced_node->bf;
-      if (next->right)
-        next->right->parent = next->parent;
+      next->bf = node->bf + 1;
     }
-    // Заменить удаляемый элемент следующим по величине.
-    if (!node->parent)
-      root = next;
-    else if (node->parent->left == node)
-      node->parent->left = next;
-    else
-      node->parent->right = next;
-    next->right = node->right;
-    if (node->right)
-      node->right->parent = next;
+    move(next, node);
     next->left = node->left;
-    if (node->left)
-      node->left->parent = next;
-
-    next->parent = node->parent;
-    balance_after_remove(balanced_node);
+    next->left->parent = next;
+    balance_after_remove(balanced);
     }
 
     delete node;
     --tree_size;
-    // std::cout << "end deleting\n";
+    std::cout << height() << " " << log2(double(size())) << "\n";
 }
 
 // Выбор минимального элемента.
@@ -368,7 +344,7 @@ template <class K, class V> map<K, V>::~map() {
 }
 
 template <class K, class V> typename map<K, V>::Node* map<K, V>::right_rotate(Node *b) {
-  std::cout << "Right rot\n";
+  // std::cout << "Right rot\n";
   // Перемещаем правого потомка на место родителя
   Node *a = b->right;
   move(a, b);
@@ -386,7 +362,7 @@ template <class K, class V> typename map<K, V>::Node* map<K, V>::right_rotate(No
 }
 
 template <class K, class V> typename map<K, V>::Node* map<K, V>::left_rotate(Node *b) {
-  std::cout << "Left rot\n";
+  // std::cout << "Left rot\n";
   // Перемещаем левого потомка на место родителя
   Node *a = b->left;
   move(a, b);
@@ -544,7 +520,6 @@ template <class K, class V> void map<K, V>::balance_after_remove(Node *node) {
         node->left->right->bf = 0;
         node = big_left_rotate(node);
       } else if (node->bf == 2 && node->left->bf == -1 && node->left->right->bf == 1) {
-
         node->bf = -1;
         node->left->bf = 0;
         node->left->right->bf = 0;
@@ -562,13 +537,14 @@ template <class K, class V> void map<K, V>::balance_after_remove(Node *node) {
 
     prev = node;
     if (!node->parent)
-      return;
+         return;
     node = node->parent;
-    if (node->left == prev)
-      --node->bf;
-    else
-      ++node->bf;
-  }
+    // if (node->left == prev)
+    //   --node->bf;
+    // else
+    //   ++node->bf;
+
+     }
 }
 
 template <class K, class V> algo::vector<V> map<K, V>::forward() {
@@ -607,5 +583,12 @@ template <class K, class V> void map<K, V>::move(Node *node, Node *position) {
   if (node)
     node->parent = position->parent;
 }
+
+template <class K, class V> typename map<K, V>::Node * map<K, V>::minimum(Node *node) {
+  while (node->left)
+    node = node->left;
+  return node;
+}
+
 
 }; // namespace algo
