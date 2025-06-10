@@ -3,11 +3,7 @@
 #include "vector.hpp"
 #include <algorithm>
 #include <cstdint>
-#include <ctype.h>
-#include <exception>
-#include <iostream>
 #include <stdexcept>
-#include <string>
 #include <utility>
 
 namespace algo {

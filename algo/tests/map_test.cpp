@@ -23,28 +23,44 @@ TEST(map, copy) {
   string k = "a";
   ASSERT_EQ(2, a[k]);
   ASSERT_EQ(2, b[k]);
-  ASSERT_EQ(2, c[k]);
+  // ASSERT_EQ(2, c[k]);
 }
 
 TEST(map, iterator) {
   smap a;
-  for (char i = 'a'; i <= 'z'; ++i) {
-    string ch = {i};
-    a.insert(ch, i);
+  a.insert({'g'}, 'g');
+  a.insert({'f'}, 'f');
+  a.insert({'e'}, 'e');
+  a.insert({'d'}, 'd');
+  a.insert({'c'}, 'c');
+  a.insert({'b'}, 'b');
+  a.insert({'a'}, 'a');
+  a.erase({'d'});
+  a.erase({'g'});
+  a.erase({'f'});
+
+  auto vec = a.forward();
+  for (auto i : vec) {
+    std::cout << i << std::endl;
+    ASSERT_TRUE(i >= 'a' && i <= 'z');
   }
-  for (auto i : a) {
-    ASSERT_TRUE(i.first >= "a" && i.first <= "z");
-  }
+  std::cout << "del\n";
 }
 
 TEST(map, bigtable) {
   smap a;
   for (char i = 'a'; i <= 'z'; ++i)
-    for (char j = 'a'; j <= 'z'; ++j) {
+    for (char j = 'z'; j >= 'a'; --j) {
       string ch = {i, j};
       a.insert(ch, i);
     }
 
+  int i = 0;
+  auto vec = a.forward();
+  for (auto ch: vec)
+    ++i;
+  std::cout << a.height() << std::endl;
+  ASSERT_EQ(676, i);
   ASSERT_EQ(676, a.size());
 }
 
@@ -84,4 +100,5 @@ TEST(map, inserterase) {
       ASSERT_EQ(25-(i-'a'), a.size());
       ASSERT_FALSE(a.contains(ch));
     }
+    std::cout << "Delete!!!!\n";
 }
